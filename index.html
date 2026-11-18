@@ -12,24 +12,60 @@
 <div class="modal" id="cartModal"><div class="panel"><div class="panelhead"><h2>आपका Cart</h2><button onclick="closeM('cartModal')">✕</button></div><div id="cartRows"></div><p><b>कुल: <span id="total">₹0</span></b></p><button class="primary" style="width:100%" onclick="checkout()">Checkout</button></div></div>
 <div class="modal" id="checkoutModal"><div class="panel"><div class="panelhead"><h2>ऑर्डर की जानकारी</h2><button onclick="closeM('checkoutModal')">✕</button></div><form onsubmit="placeOrder(event)"><div class="row"><label class="field">नाम<input id="cname" required></label><label class="field">मोबाइल<input id="cphone" required pattern="[0-9]{10}" inputmode="numeric"></label></div><label class="field">पूरा पता<textarea id="caddress" required></textarea></label><label class="field">पेमेंट<select id="payment"><option>Cash on Delivery</option><option>UPI / Online (भुगतान की पुष्टि दुकान करेगी)</option></select></label><p class="notice">ऑर्डर भेजने पर दुकान की टीम फोन से पुष्टि करेगी। वास्तविक ऑनलाइन पेमेंट के लिए Payment Gateway जोड़ना बाकी है।</p><button class="primary" style="width:100%">ऑर्डर भेजें</button></form></div></div>
 <div class="modal" id="adminModal"><div class="panel"><div class="panelhead"><h2>Admin Dashboard</h2><button onclick="closeM('adminModal')">✕</button></div><div id="login"><p class="muted">पहली बार का PIN: 1234 — लॉगिन के बाद बदलें।</p><input id="pinInput" type="password" placeholder="Admin PIN"><button class="primary" onclick="login()">Login</button></div><div id="dashboard" class="hide"><div class="tabs"><button class="tab active" onclick="tab('inventory',this)">Products & Stock</button><button class="tab" onclick="tab('orders',this)">Orders</button><button class="tab" onclick="tab('settings',this)">Settings</button></div><section id="inventory"><button class="primary" onclick="editProduct()">+ Product जोड़ें</button> <button class="soft" onclick="backup()">Backup</button><div id="inventoryRows"></div><div id="editor" class="hide"></div></section><section id="orders" class="hide"></section><section id="settings" class="hide"><label class="field">नया Admin PIN<input id="newPin" type="password"></label><button class="primary" onclick="changePin()">PIN बदलें</button><p class="notice">यह प्रारंभिक संस्करण डेटा इसी ब्राउज़र में सेव करता है। सभी ग्राहकों और Admin के बीच साझा ऑर्डर/स्टॉक के लिए ऑनलाइन Database जोड़ना जरूरी है।</p></section></div></div></div>
-<script>
-const seed=[{id:1,name:"Android Smartphone",cat:"Mobiles",price:9999,stock:8,icon:"📱"},{id:2,name:"LED Smart TV",cat:"TV",price:18999,stock:5,icon:"📺"},{id:3,name:"1.5 Ton Split AC",cat:"AC",price:32999,stock:4,icon:"❄️"},{id:4,name:"Double Door Refrigerator",cat:"Refrigerator",price:24999,stock:3,icon:"🧊"},{id:5,name:"Washing Machine",cat:"Washing Machine",price:15999,stock:6,icon:"🫧"},{id:6,name:"Bluetooth Speaker",cat:"Accessories",price:1999,stock:12,icon:"🔊"},{id:7,name:"Laptop",cat:"Laptop",price:42999,stock:2,icon:"💻"},{id:8,name:"Induction Cooktop",cat:"Kitchen",price:2499,stock:7,icon:"🍳"}];
-let products=JSON.parse(localStorage.ge_products||"null")||seed,cart=JSON.parse(localStorage.ge_cart||"{}"),orders=JSON.parse(localStorage.ge_orders||"[]"),pin=localStorage.ge_pin||"1234",category="All",editing=0;
-const save=()=>{localStorage.ge_products=JSON.stringify(products);localStorage.ge_cart=JSON.stringify(cart);localStorage.ge_orders=JSON.stringify(orders)},money=n=>"₹"+Number(n).toLocaleString("en-IN"),esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-function render(){let cats=["All",...new Set(products.map(p=>p.cat))];catsEl.innerHTML=cats.map(c=>'<button class="cat '+(c===category?'active':'')+'" onclick="category='+JSON.stringify(c)+';render()">'+(c==="All"?"सभी":esc(c))+'</button>').join("");let q=search.value.toLowerCase(),list=products.filter(p=>(category==="All"||p.cat===category)&&(p.name+" "+p.cat).toLowerCase().includes(q));results.textContent=list.length+" प्रोडक्ट";productsEl.innerHTML=list.map(p=>'<article class="product"><div class="photo">'+(p.icon||"📦")+'</div><div class="body"><b>'+esc(p.name)+'</b><span class="muted">'+esc(p.cat)+'</span><div class="price">'+money(p.price)+'</div><span class="muted">स्टॉक: '+p.stock+'</span><button class="primary" '+(p.stock<1?'disabled':'')+' onclick="add('+p.id+')">Cart में जोड़ें</button></div></article>').join("")||'<p>कोई प्रोडक्ट नहीं मिला।</p>';count.textContent=Object.values(cart).reduce((a,b)=>a+b,0)}
-function add(id){let p=products.find(x=>x.id===id);if((cart[id]||0)>=p.stock)return alert("स्टॉक उपलब्ध नहीं है");cart[id]=(cart[id]||0)+1;save();render()}
-function openCart(){cartModal.classList.add("show");drawCart()}function drawCart(){let entries=Object.entries(cart).filter(([id,q])=>q>0).map(([id,q])=>({p:products.find(x=>x.id==id),q})).filter(x=>x.p);cartRows.innerHTML=entries.map(({p,q})=>'<div class="line"><span>'+esc(p.name)+'<br>'+money(p.price)+' × '+q+'</span><span class="qty"><button onclick="changeQty('+p.id+',-1)">−</button>'+q+'<button onclick="changeQty('+p.id+',1)">+</button></span></div>').join("")||"Cart खाली है";total.textContent=money(entries.reduce((s,x)=>s+x.p.price*x.q,0))}
-function changeQty(id,d){let p=products.find(x=>x.id===id);cart[id]=(cart[id]||0)+d;if(cart[id]<=0)delete cart[id];if(cart[id]>p.stock)cart[id]=p.stock;save();drawCart();render()}
-function checkout(){if(!Object.keys(cart).length)return alert("Cart खाली है");closeM("cartModal");checkoutModal.classList.add("show")}
-function placeOrder(e){e.preventDefault();let items=Object.entries(cart).map(([id,q])=>{let p=products.find(x=>x.id==id);return {id:p.id,name:p.name,price:p.price,qty:q}}),totalAmt=items.reduce((s,x)=>s+x.price*x.qty,0);for(let x of items)if(products.find(p=>p.id===x.id).stock<x.qty)return alert("स्टॉक बदल गया है");let o={id:"GE"+Date.now().toString().slice(-7),date:new Date().toLocaleString("en-IN"),name:cname.value,phone:cphone.value,address:caddress.value,payment:payment.value,status:"नया",items,total:totalAmt};orders.unshift(o);items.forEach(x=>products.find(p=>p.id===x.id).stock-=x.qty);cart={};save();closeM("checkoutModal");render();alert("ऑर्डर दर्ज हुआ: "+o.id+" — दुकान की टीम आपसे संपर्क करेगी।");window.open("https://wa.me/919546400800?text="+encodeURIComponent("नया ऑर्डर "+o.id+" | "+o.name+" | "+o.phone+" | "+items.map(x=>x.name+" x "+x.qty).join(", ")+" | कुल "+money(totalAmt)),"_blank")}
-function closeM(id){document.getElementById(id).classList.remove("show")}function openAdmin(){adminModal.classList.add("show");loginBox()}function loginBox(){login.classList.remove("hide");dashboard.classList.add("hide")}function login(){if(pinInput.value!==pin)return alert("गलत PIN");login.classList.add("hide");dashboard.classList.remove("hide");drawInventory()}
-function tab(id,b){["inventory","orders","settings"].forEach(x=>document.getElementById(x).classList.toggle("hide",x!==id));document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));b.classList.add("active");if(id==="orders")drawOrders()}
-function drawInventory(){inventoryRows.innerHTML='<table class="table"><tr><th>Product</th><th>Price</th><th>Stock</th><th></th></tr>'+products.map(p=>'<tr><td>'+esc(p.name)+'</td><td>'+money(p.price)+'</td><td>'+p.stock+'</td><td><button class="soft" onclick="editProduct('+p.id+')">Edit</button> <button onclick="del('+p.id+')">✕</button></td></tr>').join("")+'</table>'}
-function editProduct(id=0){editing=id;let p=products.find(x=>x.id===id)||{name:"",cat:"Mobiles",price:0,stock:0,icon:"📦"};editor.classList.remove("hide");editor.innerHTML='<h3>'+(id?"Edit Product":"नया Product")+'</h3><div class="row"><label class="field">नाम<input id="pn" value="'+esc(p.name)+'"></label><label class="field">Category<input id="pc" value="'+esc(p.cat)+'"></label><label class="field">Price<input id="pp" type="number" min="0" value="'+p.price+'"></label><label class="field">Stock<input id="ps" type="number" min="0" value="'+p.stock+'"></label><label class="field">Icon<input id="pi" value="'+esc(p.icon)+'"></label></div><button class="primary" onclick="saveProduct()">Save</button>';editor.scrollIntoView({behavior:"smooth"})}
-function saveProduct(){let p={id:editing||Date.now(),name:pn.value.trim(),cat:pc.value.trim()||"Other",price:+pp.value,stock:+ps.value,icon:pi.value||"📦"};if(!p.name||p.price<0||p.stock<0)return alert("सही जानकारी भरें");if(editing)products[products.findIndex(x=>x.id===editing)]=p;else products.push(p);save();drawInventory();render();editor.classList.add("hide")}
-function del(id){if(confirm("Product हटाएँ?")){products=products.filter(p=>p.id!==id);delete cart[id];save();drawInventory();render()}}
-function drawOrders(){ordersSection.innerHTML=orders.map(o=>'<div class="product" style="padding:12px;margin:10px 0"><b>'+o.id+' • '+esc(o.name)+' • '+money(o.total)+'</b><p class="muted">'+esc(o.date)+' | '+esc(o.phone)+' | '+esc(o.payment)+'</p><p>'+o.items.map(x=>esc(x.name)+' × '+x.qty).join(", ")+'</p><p>'+esc(o.address)+'</p><select onchange="statusOrder(\''+o.id+'\',this.value)">'+["नया","Confirmed","Processing","Delivered","Cancelled"].map(s=>'<option '+(o.status===s?'selected':'')+'>'+s+'</option>').join("")+'</select></div>').join("")||"अभी कोई ऑर्डर नहीं"}
-function statusOrder(id,s){orders.find(x=>x.id===id).status=s;save()}function changePin(){if(newPin.value.length<4)return alert("कम से कम 4 अक्षर रखें");pin=newPin.value;localStorage.ge_pin=pin;newPin.value="";alert("PIN बदल गया")}
-function backup(){let a=document.createElement("a"),u=URL.createObjectURL(new Blob([JSON.stringify({products,orders})],{type:"application/json"}));a.href=u;a.download="gita-electronics-backup.json";a.click();URL.revokeObjectURL(u)}
-const catsEl=document.getElementById("cats"),productsEl=document.getElementById("products"),ordersSection=document.getElementById("orders");document.getElementById("year").textContent=new Date().getFullYear();render();
+<script type="module">
+import { db } from "./firebase.js";
+import { collection, onSnapshot, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+const $ = id => document.getElementById(id);
+const search = $("search"), catsEl = $("cats"), productsEl = $("products");
+const results = $("results"), count = $("count"), cartModal = $("cartModal");
+const cartRows = $("cartRows"), total = $("total"), checkoutModal = $("checkoutModal");
+const cname = $("cname"), cphone = $("cphone"), caddress = $("caddress"), payment = $("payment");
+let products = [], cart = JSON.parse(localStorage.ge_cart || "{}"), category = "All";
+const money = n => "₹" + Number(n || 0).toLocaleString("en-IN");
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const saveCart = () => { localStorage.ge_cart = JSON.stringify(cart); };
+function render() {
+  const cats = ["All", ...new Set(products.map(p => p.cat || "Other"))];
+  if (!cats.includes(category)) category = "All";
+  catsEl.innerHTML = cats.map(c => '<button class="cat '+(c===category?'active':'')+'" data-cat="'+esc(c)+'">'+(c==="All"?"सभी":esc(c))+'</button>').join("");
+  catsEl.querySelectorAll("[data-cat]").forEach(b => b.addEventListener("click", () => { category=b.dataset.cat; render(); }));
+  const q = search.value.toLowerCase();
+  const list = products.filter(p => (category==="All" || p.cat===category) && (p.name+" "+p.cat).toLowerCase().includes(q));
+  results.textContent = list.length + " प्रोडक्ट";
+  productsEl.innerHTML = list.map(p => '<article class="product"><div class="photo">'+esc(p.icon||"📦")+'</div><div class="body"><b>'+esc(p.name)+'</b><span class="muted">'+esc(p.cat)+'</span><div class="price">'+money(p.price)+'</div><span class="muted">स्टॉक: '+Number(p.stock||0)+'</span><button class="primary" '+(Number(p.stock||0)<1?'disabled':'')+' data-add="'+esc(p.id)+'">Cart में जोड़ें</button></div></article>').join("") || '<p>अभी कोई प्रोडक्ट उपलब्ध नहीं है। Admin Panel से प्रोडक्ट जोड़ें।</p>';
+  productsEl.querySelectorAll("[data-add]").forEach(b => b.addEventListener("click", () => add(b.dataset.add)));
+  count.textContent = Object.values(cart).reduce((a,b)=>a+Number(b),0);
+}
+function add(id) { const p=products.find(x=>x.id===id); if(!p)return; if((cart[id]||0)>=Number(p.stock||0))return alert("स्टॉक उपलब्ध नहीं है"); cart[id]=(cart[id]||0)+1; saveCart(); render(); }
+function openCart(){cartModal.classList.add("show");drawCart();}
+function drawCart(){
+  const entries=Object.entries(cart).filter(([id,q])=>q>0).map(([id,q])=>({p:products.find(x=>x.id===id),q})).filter(x=>x.p);
+  cartRows.innerHTML=entries.map(({p,q})=>'<div class="line"><span>'+esc(p.name)+'<br>'+money(p.price)+' × '+q+'</span><span class="qty"><button data-minus="'+esc(p.id)+'">−</button>'+q+'<button data-plus="'+esc(p.id)+'">+</button></span></div>').join("")||"Cart खाली है";
+  total.textContent=money(entries.reduce((s,x)=>s+Number(x.p.price)*x.q,0));
+  cartRows.querySelectorAll("[data-minus]").forEach(b=>b.addEventListener("click",()=>changeQty(b.dataset.minus,-1)));
+  cartRows.querySelectorAll("[data-plus]").forEach(b=>b.addEventListener("click",()=>changeQty(b.dataset.plus,1)));
+}
+function changeQty(id,d){const p=products.find(x=>x.id===id);cart[id]=(cart[id]||0)+d;if(cart[id]<=0)delete cart[id];if(p&&cart[id]>Number(p.stock||0))cart[id]=Number(p.stock||0);saveCart();drawCart();render();}
+function checkout(){if(!Object.keys(cart).length)return alert("Cart खाली है");closeM("cartModal");checkoutModal.classList.add("show");}
+async function placeOrder(e){
+  e.preventDefault();
+  const items=Object.entries(cart).map(([id,q])=>{const p=products.find(x=>x.id===id);return p?{productId:p.id,name:p.name,price:Number(p.price),qty:q}:null;}).filter(Boolean);
+  if(!items.length)return alert("Cart खाली है");
+  for(const x of items){const p=products.find(y=>y.id===x.productId);if(!p||Number(p.stock||0)<x.qty)return alert("स्टॉक बदल गया है। कृपया Cart अपडेट करें।");}
+  const totalAmt=items.reduce((s,x)=>s+x.price*x.qty,0);
+  const order={date:new Date().toLocaleString("en-IN"),createdAt:serverTimestamp(),name:cname.value.trim(),phone:cphone.value.trim(),address:caddress.value.trim(),payment:payment.value,status:"नया",items,total:totalAmt};
+  try{
+    const ref=await addDoc(collection(db,"orders"),order);
+    cart={};saveCart();closeM("checkoutModal");render();
+    alert("ऑर्डर दर्ज हुआ: "+ref.id+" — दुकान की टीम आपसे संपर्क करेगी।");
+    window.open("https://wa.me/919546400800?text="+encodeURIComponent("नया ऑर्डर "+ref.id+" | "+order.name+" | "+order.phone+" | "+items.map(x=>x.name+" x "+x.qty).join(", ")+" | कुल "+money(totalAmt)),"_blank");
+  }catch(err){console.error(err);alert("ऑर्डर सेव नहीं हुआ। कृपया इंटरनेट और Firebase Rules जाँचें।");}
+}
+function closeM(id){$(id).classList.remove("show");}
+$("year").textContent=new Date().getFullYear();
+search.addEventListener("input",render);
+onSnapshot(collection(db,"products"), snap=>{products=snap.docs.map(d=>({id:d.id,...d.data()}));render();}, err=>{console.error(err);results.textContent="Database से कनेक्शन नहीं हुआ";});
+window.openCart=openCart;window.checkout=checkout;window.placeOrder=placeOrder;window.closeM=closeM;
+render();
 </script></body></html>
