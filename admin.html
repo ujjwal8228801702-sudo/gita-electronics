@@ -62,8 +62,9 @@ function refresh(){
   $("productRows").innerHTML=products.map(p=>'<tr><td>'+esc(p.name)+'</td><td>'+esc(p.cat)+'</td><td>'+money(p.price)+'</td><td>'+Number(p.stock||0)+'</td><td><button class="soft" data-edit="'+esc(p.id)+'">Edit</button> <button class="danger" data-delete="'+esc(p.id)+'">Delete</button></td></tr>').join("");
   $("productRows").querySelectorAll("[data-edit]").forEach(b=>b.addEventListener("click",()=>editor(b.dataset.edit)));
   $("productRows").querySelectorAll("[data-delete]").forEach(b=>b.addEventListener("click",()=>removeProduct(b.dataset.delete)));
-  $("orderRows").innerHTML=orders.map(o=>'<div class="item"><b>'+esc(o.id)+' · '+esc(o.name)+' · '+money(o.total)+'</b><p>'+esc(o.phone)+' | '+esc(o.date)+' | '+esc(o.payment)+'</p><p>'+((o.items||[]).map(x=>esc(x.name)+" × "+x.qty).join(", "))+'</p><p>'+esc(o.address)+'</p><label class="field">Order Status<select data-status="'+esc(o.id)+'">'+["Pending","Confirmed","Processing","Shipped","Delivered","Cancelled"].map(s=>'<option '+(o.status===s?'selected':'')+'>'+s+'</option>').join("")+'</select></label></div>').join("")||"अभी कोई ऑर्डर नहीं";
+  $("orderRows").innerHTML=orders.map(o=>'<div class="item"><b>'+esc(o.id)+' · '+esc(o.name)+' · '+money(o.total)+'</b><p>'+esc(o.phone)+' | '+esc(o.date)+' | '+esc(o.payment)+'</p><p>'+((o.items||[]).map(x=>esc(x.name)+" × "+x.qty).join(", "))+'</p><p>'+esc(o.address)+'</p><button class="primary" data-bill="'+esc(o.id)+'">🧾 बिल बनाएँ / Print Bill</button><label class="field">Order Status<select data-status="'+esc(o.id)+'">'+["Pending","Confirmed","Processing","Shipped","Delivered","Cancelled"].map(s=>'<option '+(o.status===s?'selected':'')+'>'+s+'</option>').join("")+'</select></label></div>').join("")||"अभी कोई ऑर्डर नहीं";
   $("orderRows").querySelectorAll("[data-status]").forEach(s=>s.addEventListener("change",()=>setStatus(s.dataset.status,s.value)));
+  $("orderRows").querySelectorAll("[data-bill]").forEach(b=>b.addEventListener("click",()=>printBill(b.dataset.bill)));
 }
 function editor(id=null){
   editing=id;const p=products.find(x=>x.id===id)||{name:"",cat:"Mobiles",price:0,stock:0,icon:"📦"};
@@ -80,11 +81,18 @@ async function saveProduct(){
 }
 async function removeProduct(id){if(!confirm("यह Product हटाएँ?"))return;try{await deleteDoc(doc(db,"products",id));}catch(e){alert("Delete नहीं हुआ: "+e.message);}}
 async function setStatus(id,status){try{await updateDoc(doc(db,"orders",id),{status});}catch(e){alert("Status अपडेट नहीं हुआ: "+e.message);}}
+function printBill(id){
+  const o=orders.find(x=>x.id===id);if(!o)return alert("ऑर्डर नहीं मिला।");
+  const rows=(o.items||[]).map(x=>'<tr><td>'+esc(x.name)+'</td><td>'+Number(x.qty||0)+'</td><td>'+money(x.price)+'</td><td>'+money(Number(x.price||0)*Number(x.qty||0))+'</td></tr>').join("");
+  const w=window.open("","_blank","width=800,height=700");if(!w)return alert("बिल खोलने के लिए Browser में Pop-up की अनुमति दें।");
+  w.document.write('<!doctype html><html lang="hi"><head><meta charset="utf-8"><title>Gita Electronics Bill</title><style>body{font:14px Arial,sans-serif;color:#17223b;padding:28px;max-width:760px;margin:auto}h1{margin:0;color:#101b35}.muted{color:#667085}.top{display:flex;justify-content:space-between;gap:20px;border-bottom:2px solid #101b35;padding-bottom:15px}.meta{margin:18px 0;line-height:1.8}.items{width:100%;border-collapse:collapse;margin-top:15px}.items th,.items td{border:1px solid #d8deea;padding:10px;text-align:left}.items th{background:#f1f4fa}.total{text-align:right;font-size:20px;font-weight:bold;margin-top:18px}.foot{margin-top:35px;border-top:1px solid #ddd;padding-top:12px;text-align:center;color:#667085;font-size:12px}@media print{button{display:none}body{padding:0}}</style></head><body><div class="top"><div><h1>GITA ELECTRONICS</h1><div class="muted">Phokra Chowk, Dumka</div><div class="muted">मोबाइल: 9546400800</div></div><div style="text-align:right"><h2>ORDER BILL</h2><div>Order No: '+esc(o.id)+'</div><div>Date: '+esc(o.date||"")+'</div></div></div><div class="meta"><b>Customer Details</b><br>Name: '+esc(o.name)+'<br>Mobile: '+esc(o.phone)+'<br>Address: '+esc(o.address)+'<br>Payment: '+esc(o.payment)+'<br>Order Status: '+esc(o.status||"Pending")+'</div><table class="items"><thead><tr><th>Product</th><th>Qty</th><th>Rate</th><th>Amount</th></tr></thead><tbody>'+rows+'</tbody></table><div class="total">Grand Total: '+money(o.total)+'</div><div class="foot">Thank you for shopping with Gita Electronics.<br>This is an order receipt; tax/GST details are not included.</div><p style="text-align:center"><button onclick="window.print()">Print / Save as PDF</button></p></body></html>');
+  w.document.close();w.focus();
+}
 async function changePassword(){
   const p=$("newpass").value;if(p.length<6)return alert("Password कम से कम 6 अक्षर का रखें।");
   try{await updatePassword(auth.currentUser,p);$("newpass").value="";alert("Password बदल गया।");}
   catch(e){alert("Password बदलने के लिए दोबारा Login करना पड़ सकता है: "+e.message);}
 }
 function backup(){const a=document.createElement("a"),u=URL.createObjectURL(new Blob([JSON.stringify({products,orders},null,2)],{type:"application/json"}));a.href=u;a.download="gita-electronics-backup.json";a.click();URL.revokeObjectURL(u);}
-window.login=login;window.logout=logout;window.show=show;window.editor=editor;window.saveProduct=saveProduct;window.cancelEditor=cancelEditor;window.changePassword=changePassword;window.backup=backup;
+window.login=login;window.logout=logout;window.show=show;window.editor=editor;window.saveProduct=saveProduct;window.cancelEditor=cancelEditor;window.printBill=printBill;window.changePassword=changePassword;window.backup=backup;
 </script></body></html>
