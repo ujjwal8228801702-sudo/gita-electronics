@@ -28,7 +28,7 @@ input,select{background:#fbfcff;border-color:#e2e8f2;border-radius:11px}input:fo
 <section id="app" class="hidden">
 <div class="grid"><div class="stat">कुल Products<b id="pc">0</b></div><div class="stat">कुल Orders<b id="oc">0</b></div><div class="stat">कुल Order Value<b id="sales">₹0</b></div></div>
 <nav class="tabs"><button class="primary" onclick="show('products')">Products & Stock</button><button class="soft" onclick="show('orders')">Orders</button><button class="soft" onclick="show('settings')">Settings</button></nav>
-<section id="products" class="card"><h2>Products & Stock</h2><button class="primary" onclick="editor()">+ नया Product</button><div id="editBox" class="hidden"></div><div class="scroll"><table class="table"><thead><tr><th>नाम</th><th>Category</th><th>Price</th><th>Stock</th><th>Action</th></tr></thead><tbody id="productRows"></tbody></table></div></section>
+<section id="products" class="card"><h2>Products & Stock</h2><div class="card" style="background:#f5f7ff;border:1px solid #dfe7ff"><h3>📱 Automatic Product Import</h3><p class="muted">फोन का नाम खोजें। उपलब्ध फोटो और specifications चुनकर Product में भरें।</p><div class="row"><input id="deviceSearch" placeholder="जैसे iPhone 17"><button class="primary" onclick="searchDevice()">फोन खोजें</button></div><div id="deviceResults" style="margin-top:12px"></div></div><button class="primary" onclick="editor()">+ नया Product</button><div id="editBox" class="hidden"></div><div class="scroll"><table class="table"><thead><tr><th>नाम</th><th>Category</th><th>Price</th><th>Stock</th><th>Action</th></tr></thead><tbody id="productRows"></tbody></table></div></section>
 <section id="orders" class="card hidden"><h2>Customer Orders</h2><div id="orderRows"></div></section>
 <section id="settings" class="card hidden"><h2>Admin Settings</h2><label class="field">नया Password / PIN<input id="newpass" type="password" minlength="4" placeholder="कम से कम 4 अक्षर"></label><button class="primary" onclick="changePassword()">Password बदलें</button><p class="note">Products और Orders Firebase Cloud Database में सेव होते हैं और Admin लॉगिन के बाद सभी डिवाइस पर दिखाई देंगे।</p><button class="soft" onclick="backup()">डेटा Backup डाउनलोड करें</button></section>
 </section></main>
@@ -85,15 +85,48 @@ function refresh(){
   $("orderRows").querySelectorAll("[data-status]").forEach(s=>s.addEventListener("change",()=>setStatus(s.dataset.status,s.value)));
   $("orderRows").querySelectorAll("[data-bill]").forEach(b=>b.addEventListener("click",()=>printBill(b.dataset.bill)));
 }
+
+const DEVICE_API_URL = "https://script.google.com/macros/s/AKfycbxPIH5re5RDlDAw-Wizg_gKsmnQH7X_RlTqa76jfNO7nARo1VR4FOdHQIx9cl9wvTh5/exec";
+let foundDevices=[];
+function searchDevice(){
+  const q=$("deviceSearch").value.trim();
+  if(!q)return alert("फोन का नाम लिखें");
+  $("deviceResults").textContent="फोन खोजा जा रहा है...";
+  const old=document.getElementById("deviceSearchScript");if(old)old.remove();
+  const script=document.createElement("script");
+  script.id="deviceSearchScript";
+  script.src=DEVICE_API_URL+"?q="+encodeURIComponent(q)+"&callback=handleDeviceSearch";
+  script.onerror=()=>{$("deviceResults").textContent="Search कनेक्शन नहीं हुआ। फिर कोशिश करें।";};
+  document.body.appendChild(script);
+}
+window.handleDeviceSearch=function(response){
+  const devices=response&&response.data&&response.data.devices?response.data.devices:[];
+  foundDevices=devices;
+  if(!response||response.success!==true){$("deviceResults").textContent=(response&&response.error)||"फोन नहीं मिला";return;}
+  if(!devices.length){$("deviceResults").textContent="कोई फोन नहीं मिला।";return;}
+  $("deviceResults").innerHTML=devices.map((d,i)=>'<div class="item" style="display:flex;gap:12px;align-items:center"><img src="'+esc(d.image_url||"")+'" alt="" style="width:76px;height:76px;object-fit:contain;background:#f5f7fb;border-radius:10px"><div style="flex:1;min-width:0"><b>'+esc(d.name)+'</b><div class="muted">'+esc(d.manufacturer_name||"")+' · '+esc(d.hardware||"")+' · '+esc(d.screen_resolution||"")+'</div><div class="muted">Storage: '+esc(d.storage||"")+' | Camera: '+esc(d.camera||"")+'</div></div><button class="soft" data-device-import="'+i+'">Import</button></div>').join("");
+  $("deviceResults").querySelectorAll("[data-device-import]").forEach(b=>b.addEventListener("click",()=>importDevice(Number(b.dataset.deviceImport))));
+};
+function importDevice(index){
+  const d=foundDevices[index];if(!d)return;
+  editor();
+  $("pn").value=d.name||"";
+  $("cat").value="Mobiles";
+  $("price").value="";
+  $("stock").value="0";
+  $("icon").value="📱";
+  $("image_url").value=d.image_url||"";
+  $("description").value=[d.screen_resolution,d.hardware,d.camera?("Camera "+d.camera):"",d.battery_capacity?("Battery "+d.battery_capacity):"",d.storage?("Storage "+d.storage):"",d.colors?("Colors "+d.colors):"",d.model_numbers?("Model "+d.model_numbers):""].filter(Boolean).join(" | ");
+}
 function editor(id=null){
   editing=id;const p=products.find(x=>x.id===id)||{name:"",cat:"Mobiles",price:0,stock:0,icon:"📦"};
   $("editBox").classList.remove("hidden");
-  $("editBox").innerHTML='<h3>'+(id?"Product Edit":"नया Product")+'</h3><div class="row"><label class="field">Product Name<input id="pn" value="'+esc(p.name)+'"></label><label class="field">Category<input id="cat" value="'+esc(p.cat)+'"></label><label class="field">Price<input id="price" type="number" min="0" value="'+Number(p.price||0)+'"></label><label class="field">Stock<input id="stock" type="number" min="0" value="'+Number(p.stock||0)+'"></label><label class="field">Icon / Emoji<input id="icon" value="'+esc(p.icon||"📦")+'"></label></div><button class="primary" onclick="saveProduct()">Save Product</button> <button class="soft" onclick="cancelEditor()">Cancel</button>';
+  $("editBox").innerHTML='<h3>'+(id?"Product Edit":"नया Product")+'</h3><div class="row"><label class="field">Product Name<input id="pn" value="'+esc(p.name)+'"></label><label class="field">Category<input id="cat" value="'+esc(p.cat)+'"></label><label class="field">Price<input id="price" type="number" min="0" value="'+Number(p.price||0)+'"></label><label class="field">Stock<input id="stock" type="number" min="0" value="'+Number(p.stock||0)+'"></label><label class="field">Icon / Emoji<input id="icon" value="'+esc(p.icon||"📦")+'"></label><label class="field">Product Photo URL<input id="image_url" value="'+esc(p.image_url||"")+'" placeholder="https://..."></label><label class="field">Specifications<input id="description" value="'+esc(p.description||"")+'" placeholder="6.3 inch, 8GB RAM, A19, 48MP"></label></div><button class="primary" onclick="saveProduct()">Save Product</button> <button class="soft" onclick="cancelEditor()">Cancel</button>';
   $("editBox").scrollIntoView({behavior:"smooth",block:"center"});
 }
 function cancelEditor(){$("editBox").classList.add("hidden");}
 async function saveProduct(){
-  const p={name:$("pn").value.trim(),cat:$("cat").value.trim()||"Other",price:Number($("price").value),stock:Number($("stock").value),icon:$("icon").value||"📦"};
+  const p={name:$("pn").value.trim(),cat:$("cat").value.trim()||"Other",price:Number($("price").value),stock:Number($("stock").value),icon:$("icon").value||"📦",image_url:$("image_url").value.trim(),description:$("description").value.trim()};
   if(!p.name||!Number.isFinite(p.price)||p.price<0||!Number.isFinite(p.stock)||p.stock<0)return alert("सही जानकारी भरें");
   try{if(editing)await updateDoc(doc(db,"products",editing),p);else await addDoc(collection(db,"products"),p);cancelEditor();}
   catch(e){alert("Product सेव नहीं हुआ: "+e.message);}
@@ -117,5 +150,5 @@ async function changePassword(){
   catch(e){alert("Password बदलने के लिए दोबारा Login करना पड़ सकता है: "+e.message);}
 }
 function backup(){const a=document.createElement("a"),u=URL.createObjectURL(new Blob([JSON.stringify({products,orders},null,2)],{type:"application/json"}));a.href=u;a.download="gita-electronics-backup.json";a.click();URL.revokeObjectURL(u);}
-window.login=login;window.logout=logout;window.show=show;window.editor=editor;window.saveProduct=saveProduct;window.cancelEditor=cancelEditor;window.printBill=printBill;window.changePassword=changePassword;window.backup=backup;
+window.login=login;window.logout=logout;window.show=show;window.searchDevice=searchDevice;window.editor=editor;window.saveProduct=saveProduct;window.cancelEditor=cancelEditor;window.printBill=printBill;window.changePassword=changePassword;window.backup=backup;
 </script></body></html>
