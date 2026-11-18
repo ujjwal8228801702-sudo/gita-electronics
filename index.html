@@ -112,6 +112,15 @@ main{max-width:1180px}.head{margin:30px 0 15px}.head h2{letter-spacing:-.6px}
  .product>.body>.specs{font-size:10px}
 }
 
+
+/* Product filters */
+.filter-panel{display:none;background:#fff;border:1px solid #e6eaf2;border-radius:18px;padding:14px 16px;margin:0 0 15px;box-shadow:0 8px 22px #14264a08}
+.filter-panel.open{display:block}
+.filter-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.filter-panel .field{margin:0 0 12px;font-size:12px;font-weight:700;color:#53617a}
+.filter-panel .field input,.filter-panel .field select{min-width:0;font-size:14px}
+@media(max-width:700px){.filter-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.filter-panel{padding:12px}.head .actions{gap:6px}.head .actions button{padding:9px 11px}}
+
 </style></head><body>
 <div id="customerLogin" style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(135deg,#0b1430,#3157c8)">
 <div style="background:white;width:min(420px,100%);padding:26px;border-radius:22px;box-shadow:0 25px 70px #0003">
@@ -125,7 +134,17 @@ main{max-width:1180px}.head{margin:30px 0 15px}.head h2{letter-spacing:-.6px}
 </div></div><div id="siteApp" class="hide">
 <nav class="nav"><div class="brand">GITA <span>ELECTRONICS</span><small class="brand-meta">📍 Phokra Chowk, Dumka&nbsp; | &nbsp;📞 9546400800</small></div><div class="search"><input id="search" placeholder="Mobile, TV, AC, Fridge खोजें" oninput="render()"><button class="primary" onclick="render()">खोजें</button></div><button class="soft" onclick="openCart()">🛒 <b id="count">0</b></button><button class="soft menu-trigger" aria-label="Menu" onclick="toggleMenu(true)">☰</button></nav>
 <section class="hero"><div><div class="tag">SMART SHOPPING • GREAT DEALS</div><h1>आपकी पसंद,<br>आपकी अपनी दुकान!</h1><p>Mobile, TV, AC, Refrigerator, Washing Machine और बहुत कुछ।</p><button style="background:var(--gold);color:#17213a" onclick="document.getElementById('products').scrollIntoView({behavior:'smooth'})">प्रोडक्ट देखें ↓</button></div><div class="hero-art">📱 📺</div></section>
-<main><div class="head"><h2>हमारे प्रोडक्ट्स</h2><span class="muted" id="results"></span></div><div class="cats" id="cats"></div><div class="grid" id="products"></div></main>
+<main><div class="head"><h2>हमारे प्रोडक्ट्स</h2><div class="actions"><span class="muted" id="results"></span><button class="soft" id="filterToggle" onclick="toggleFilters()">⚙️ Filter</button></div></div>
+<section class="filter-panel" id="filterPanel">
+ <div class="filter-grid">
+  <label class="field">न्यूनतम कीमत (₹)<input id="minPrice" type="number" min="0" placeholder="जैसे 5000" oninput="render()"></label>
+  <label class="field">अधिकतम कीमत (₹)<input id="maxPrice" type="number" min="0" placeholder="जैसे 50000" oninput="render()"></label>
+  <label class="field">स्टॉक स्थिति<select id="stockFilter" onchange="render()"><option value="all">सभी प्रोडक्ट</option><option value="available">स्टॉक में उपलब्ध</option><option value="out">स्टॉक खत्म</option></select></label>
+  <label class="field">क्रम से दिखाएँ<select id="sortFilter" onchange="render()"><option value="default">Default</option><option value="low">कीमत: कम से ज्यादा</option><option value="high">कीमत: ज्यादा से कम</option><option value="az">नाम: A से Z</option></select></label>
+ </div>
+ <div class="actions"><button class="soft" onclick="resetFilters()">फिल्टर हटाएँ</button><span class="muted">Category चुनने के लिए नीचे दिए विकल्प इस्तेमाल करें।</span></div>
+</section>
+<div class="cats" id="cats"></div><div class="grid" id="products"></div></main>
 <footer class="footer"><b>GITA ELECTRONICS</b><p>Phokra Chowk, Dumka</p><small>© <span id="year"></span> Gita Electronics</small></footer>
 <div class="modal" id="cartModal"><div class="panel"><div class="panelhead"><h2>आपका Cart</h2><button onclick="closeM('cartModal')">✕</button></div><div id="cartRows"></div><p><b>कुल: <span id="total">₹0</span></b></p><button class="primary" style="width:100%" onclick="checkout()">Checkout</button></div></div>
 <div class="modal" id="checkoutModal"><div class="panel"><div class="panelhead"><h2>ऑर्डर की जानकारी</h2><button onclick="closeM('checkoutModal')">✕</button></div><form onsubmit="placeOrder(event)"><div class="row"><label class="field">नाम<input id="cname" required></label><label class="field">मोबाइल<input id="cphone" required pattern="[0-9]{10}" inputmode="numeric"></label></div><label class="field">पूरा पता<textarea id="caddress" required></textarea></label><label class="field">पेमेंट<select id="payment"><option>Cash on Delivery</option><option>UPI / Online (भुगतान की पुष्टि दुकान करेगी)</option></select></label><p class="notice">ऑर्डर भेजने पर दुकान की टीम फोन से पुष्टि करेगी। वास्तविक ऑनलाइन पेमेंट के लिए Payment Gateway जोड़ना बाकी है।</p><button class="primary" style="width:100%">ऑर्डर भेजें</button></form></div></div>
@@ -153,12 +172,31 @@ function render() {
   catsEl.innerHTML = cats.map(c => '<button class="cat '+(c===category?'active':'')+'" data-cat="'+esc(c)+'">'+(c==="All"?"सभी":esc(c))+'</button>').join("");
   catsEl.querySelectorAll("[data-cat]").forEach(b => b.addEventListener("click", () => { category=b.dataset.cat; render(); }));
   const q = search.value.toLowerCase();
-  const list = products.filter(p => (category==="All" || p.cat===category) && (p.name+" "+p.cat).toLowerCase().includes(q));
+  const min = Number($("minPrice").value || 0), max = Number($("maxPrice").value || Infinity);
+  const stockMode = $("stockFilter").value, sortMode = $("sortFilter").value;
+  let list = products.filter(p => {
+    const price = Number(p.price || 0), stock = Number(p.stock || 0);
+    const text = (p.name+" "+p.cat+" "+(p.description||"")).toLowerCase();
+    return (category==="All" || p.cat===category) && text.includes(q)
+      && price >= min && price <= max
+      && (stockMode==="all" || (stockMode==="available" && stock>0) || (stockMode==="out" && stock<1));
+  });
+  if(sortMode==="low") list.sort((a,b)=>Number(a.price||0)-Number(b.price||0));
+  if(sortMode==="high") list.sort((a,b)=>Number(b.price||0)-Number(a.price||0));
+  if(sortMode==="az") list.sort((a,b)=>String(a.name||"").localeCompare(String(b.name||"")));
   results.textContent = list.length + " प्रोडक्ट";
   productsEl.innerHTML = list.map(p => '<article class="product"><div class="photo">'+(p.image_url?'<img src="'+esc(p.image_url)+'" alt="'+esc(p.name)+'" onerror="this.remove()">':esc(p.icon||"📦"))+'</div><div class="body"><b>'+esc(p.name)+'</b><span class="muted">'+esc(p.cat)+'</span>'+(p.description?'<span class="specs">'+esc(p.description)+'</span>':'')+'<div class="price">'+money(p.price)+'</div><span class="muted">स्टॉक: '+Number(p.stock||0)+'</span><button class="primary" '+(Number(p.stock||0)<1?'disabled':'')+' data-add="'+esc(p.id)+'">Cart में जोड़ें</button></div></article>').join("") || '<p>अभी कोई प्रोडक्ट उपलब्ध नहीं है। Admin Panel से प्रोडक्ट जोड़ें।</p>';
   productsEl.querySelectorAll("[data-add]").forEach(b => b.addEventListener("click", () => add(b.dataset.add)));
   count.textContent = Object.values(cart).reduce((a,b)=>a+Number(b),0);
 }
+
+function toggleFilters(){ $("filterPanel").classList.toggle("open"); }
+function resetFilters(){
+ $("minPrice").value="";$("maxPrice").value="";
+ $("stockFilter").value="all";$("sortFilter").value="default";
+ category="All";search.value="";render();
+}
+
 function add(id) { const p=products.find(x=>x.id===id); if(!p)return; if((cart[id]||0)>=Number(p.stock||0))return alert("स्टॉक उपलब्ध नहीं है"); cart[id]=(cart[id]||0)+1; saveCart(); render(); }
 function openCart(){cartModal.classList.add("show");drawCart();}
 function drawCart(){
@@ -234,7 +272,7 @@ function closeM(id){$(id).classList.remove("show");}
 $("year").textContent=new Date().getFullYear();
 search.addEventListener("input",render);
 onSnapshot(collection(db,"products"), snap=>{products=snap.docs.map(d=>({id:d.id,...d.data()}));render();}, err=>{console.error(err);results.textContent="Database से कनेक्शन नहीं हुआ";});
-window.openCart=openCart;window.checkout=checkout;window.placeOrder=placeOrder;window.closeM=closeM;window.toggleMenu=toggleMenu;window.showCustomerOrders=showCustomerOrders;window.showCustomerProfile=showCustomerProfile;window.contactStore=contactStore;window.showAboutStore=showAboutStore;
+window.toggleFilters=toggleFilters;window.resetFilters=resetFilters;window.openCart=openCart;window.checkout=checkout;window.placeOrder=placeOrder;window.closeM=closeM;window.toggleMenu=toggleMenu;window.showCustomerOrders=showCustomerOrders;window.showCustomerProfile=showCustomerProfile;window.contactStore=contactStore;window.showAboutStore=showAboutStore;
 window.customerLogin=customerLogin;window.customerLogout=customerLogout;
 render();
 </script></body></html>
