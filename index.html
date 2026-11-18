@@ -139,8 +139,11 @@ main{max-width:1180px}.head{margin:30px 0 15px}.head h2{letter-spacing:-.6px}
 .hero-finance b{background:none;color:var(--gold);padding:0;margin-right:5px}
 .hero-services{display:flex;gap:8px;flex-wrap:wrap}
 .hero-services span{font-size:12px;font-weight:700;color:white;border:1px solid #ffffff45;border-radius:24px;padding:8px 10px;background:#ffffff12}
-.hero-store .hero-art{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px;max-width:230px;font-size:clamp(42px,5vw,72px);filter:drop-shadow(0 12px 15px #0004)}
-@media(max-width:700px){.hero-store{margin:12px 4% 18px;padding:24px 18px;min-height:210px;border-radius:22px}.hero-store .hero-art{max-width:100px;font-size:36px;gap:4px}.hero-store .hero-art span{width:44%;text-align:center}.hero-store .tag{font-size:10px}.hero-store .hero-bottom{gap:7px}.hero-finance{font-size:10px;padding:7px}.hero-finance b{display:block;margin:0 0 3px}.hero-services span{font-size:10px;padding:7px 9px}.hero-store h1{font-size:29px}.hero-store .hero-products{font-size:13px}.hero-store .hero-brands{font-size:11px}}
+.hero-store .hero-product-photos{width:310px;max-width:310px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;align-content:center;filter:none}
+.hero-store .hero-product-photo{height:104px;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;background:transparent;border:0;box-shadow:none;padding:4px;color:white}
+.hero-store .hero-product-photo b{display:grid;place-items:center;width:72px;height:72px;font-size:48px;font-weight:400;line-height:1;border-radius:22px;background:linear-gradient(145deg,#ffffff30,#ffffff0c);border:1px solid #ffffff35;filter:drop-shadow(0 8px 10px #0003)}
+.hero-store .hero-product-photo span{font-size:10px;font-weight:800;color:#fff;text-align:center;white-space:nowrap;text-shadow:0 2px 5px #07132d}
+@media(max-width:700px){.hero-store{margin:12px 4% 18px;padding:24px 18px;min-height:210px;border-radius:22px}.hero-store .hero-product-photos{width:116px;max-width:116px;grid-template-columns:repeat(2,minmax(0,1fr));gap:3px}.hero-store .hero-product-photo{height:58px;gap:2px;padding:0}.hero-store .hero-product-photo b{width:39px;height:39px;font-size:25px;border-radius:12px}.hero-store .hero-product-photo span{font-size:7px}.hero-store .tag{font-size:10px}.hero-store .hero-bottom{gap:7px}.hero-finance{font-size:10px;padding:7px}.hero-finance b{display:block;margin:0 0 3px}.hero-services span{font-size:10px;padding:7px 9px}.hero-store h1{font-size:29px}.hero-store .hero-products{font-size:13px}.hero-store .hero-brands{font-size:11px}}
 
 
 /* Premium storefront polish */
@@ -218,10 +221,13 @@ body{background:#f7f8fc;color:#17213a}
    <div class="hero-services"><span>🔄 पुराना फोन एक्सचेंज सुविधा उपलब्ध</span><span>🎧 सभी तरह की मोबाइल एक्सेसरीज उपलब्ध</span></div>
   </div>
  </div>
- <div class="hero-art hero-product-photos" aria-label="मोबाइल, एसी और रेफ्रिजरेटर की तस्वीरें">
-  <div class="hero-product-photo"><img src="https://images.rawpixel.com/image_800/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDI0LTAyL3Jhd3BpeGVsb2ZmaWNlMTVfYV9zdGlsbF9saWZlX3Bob3Rvc2hvdF9vZl9hX21hdHRlX3NtYXJ0X3Bob25lX18wNjU2MTdlNi04NTE1LTRkODUtYWVmNy02NzJkNjdhMTFhNGRfMS5qcGc.jpg" alt="मोबाइल फोन" loading="lazy"><span>मोबाइल</span></div>
-  <div class="hero-product-photo"><img src="https://assets.wfcdn.com/im/77116428/compr-r85/4302/430206256/12000BTU%2B21%2BSEER2%2BSplit%2BAir%2BConditioner%2B115V%2BR32%2BWiFi%2C%2BEco%2BMode%2C%2BAuto%2BMode%2C%2BSmart%2BSleep%2BMode%2C%2BEnergy%2BEfficient.jpg" alt="स्प्लिट एसी" loading="lazy"><span>AC</span></div>
-  <div class="hero-product-photo"><img src="https://images.rawpixel.com/image_800/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIzLTEwL2Rlc2lnbndpdGhtZTA5X2FfcGljdHVyZV9vZl9yZWZyaWdlcmF0b3JfX3dpdGhfc3R1ZGlvX2xpZ2h0X19pc18xNjdhYjJlMy02ZmVlLTQ4NWUtYmQ2ZC1hMjY3ZmVhYzhmNjdfMS5qcGc.jpg" alt="रेफ्रिजरेटर" loading="lazy"><span>रेफ्रिजरेटर</span></div>
+ <div class="hero-art hero-product-photos" aria-label="मोबाइल, स्मार्ट वॉच, एसी, वॉशिंग मशीन और रेफ्रिजरेटर">
+  <div class="hero-product-photo"><b aria-hidden="true">📱</b><span>मोबाइल</span></div>
+  <div class="hero-product-photo"><b aria-hidden="true">⌚</b><span>Smart Watch</span></div>
+  <div class="hero-product-photo"><b aria-hidden="true">📲</b><span>5G Phone</span></div>
+  <div class="hero-product-photo"><b aria-hidden="true">❄️</b><span>AC</span></div>
+  <div class="hero-product-photo"><b aria-hidden="true">🧺</b><span>Washing Machine</span></div>
+  <div class="hero-product-photo"><b aria-hidden="true">🧊</b><span>Refrigerator</span></div>
  </div>
 </section>
 <main><div class="head"><h2>हमारे प्रोडक्ट्स</h2><div class="actions"><span class="muted" id="results"></span><button class="soft" id="filterToggle" onclick="toggleFilters()">⚙️ Filter</button></div></div>
