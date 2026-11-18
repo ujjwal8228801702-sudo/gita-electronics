@@ -2,6 +2,25 @@
 <html lang="hi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101b35"><title>Gita Electronics | Admin</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#f3f5fa;color:#17223b;font:15px system-ui,sans-serif}.bar{background:#101b35;color:white;padding:16px 5%;display:flex;justify-content:space-between;align-items:center}.wrap{max-width:1050px;margin:24px auto;padding:0 14px}.card{background:white;border:1px solid #e3e8f1;border-radius:15px;padding:17px;margin:12px 0}.login{max-width:420px;margin:55px auto}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.stat{background:#edf2ff;padding:14px;border-radius:12px}.stat b{display:block;font-size:23px}.tabs{display:flex;gap:8px;overflow:auto;margin:14px 0}.btn,button{border:0;border-radius:9px;padding:10px 13px;font:inherit;font-weight:700;cursor:pointer}.primary{background:#2457d6;color:white}.soft{background:#eaf0ff;color:#2457d6}.danger{background:#ffe9e9;color:#a52222}input,select{width:100%;padding:11px;border:1px solid #dce2ed;border-radius:8px;font:inherit}.field{display:grid;gap:6px;margin:10px 0}.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.table{width:100%;border-collapse:collapse}.table th,.table td{text-align:left;padding:10px;border-bottom:1px solid #e7ebf2;font-size:13px}.hidden{display:none!important}.note{background:#fff5d9;color:#6c5010;padding:12px;border-radius:10px;font-size:13px}.item{border-bottom:1px solid #e8edf5;padding:12px 0}.item:last-child{border:0}@media(max-width:600px){.grid{grid-template-columns:1fr 1fr}.row{grid-template-columns:1fr}.table{min-width:550px}.scroll{overflow:auto}}
+
+
+/* Modern admin dashboard refresh */
+:root{--admin-ink:#111b38;--admin-blue:#3157e8}
+body{background:radial-gradient(ellipse at 5% 0%,#e9efff 0,transparent 35%),#f5f7fb;color:#17213a;font-family:Inter,system-ui,-apple-system,sans-serif}
+.bar{background:linear-gradient(110deg,#0b1430,#1a3478 75%,#3157c8);padding:18px max(5%,calc((100% - 1050px)/2));box-shadow:0 8px 25px #14264a1c}
+.bar b{letter-spacing:.4px;font-size:16px}
+.wrap{max-width:1080px;margin:30px auto}
+.card{background:#fff;border:1px solid #e8edf5;border-radius:20px;padding:20px;box-shadow:0 8px 28px #14264a08}
+.login{box-shadow:0 18px 45px #14264a12}
+.grid{gap:13px}.stat{background:linear-gradient(145deg,#f0f4ff,#e7edff);border:1px solid #e0e8ff;border-radius:16px;padding:17px}.stat b{font-size:26px;color:#172b68}
+.tabs{gap:9px;padding-bottom:4px}.tabs button{border-radius:999px;background:#eef2fa;color:#263452}.tabs button.active,.tabs .primary{background:linear-gradient(135deg,#3157e8,#2343bd);color:#fff}
+button,.btn{border-radius:12px;transition:transform .18s,box-shadow .18s}.primary{background:linear-gradient(135deg,#3157e8,#2343bd);box-shadow:0 5px 13px #3157e82b}.soft{background:#edf2ff;color:#3157e8}
+button:hover{transform:translateY(-1px);box-shadow:0 7px 18px #17213a18}
+input,select{background:#fbfcff;border-color:#e2e8f2;border-radius:11px}input:focus,select:focus{outline:3px solid #3157e81c;border-color:#3157e8}
+.item{padding:17px 0;border-color:#edf0f6}.note{border:1px solid #f3e3b1;border-radius:12px}
+.table th{background:#f5f7fc;color:#52617b}.table td,.table th{padding:12px}
+@media(max-width:600px){.wrap{margin:18px auto}.card{padding:15px;border-radius:17px}.bar{padding:14px 4%}.grid{gap:9px}.stat{padding:12px}.stat b{font-size:21px}}
+
 </style></head><body>
 <header class="bar"><b>GITA ELECTRONICS · ADMIN</b><div><button class="soft" onclick="logout()">Logout</button> <a href="./" style="color:white">← Website</a></div></header>
 <main class="wrap">
