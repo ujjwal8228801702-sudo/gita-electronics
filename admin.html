@@ -3,28 +3,88 @@
 <style>
 *{box-sizing:border-box}body{margin:0;background:#f3f5fa;color:#17223b;font:15px system-ui,sans-serif}.bar{background:#101b35;color:white;padding:16px 5%;display:flex;justify-content:space-between;align-items:center}.wrap{max-width:1050px;margin:24px auto;padding:0 14px}.card{background:white;border:1px solid #e3e8f1;border-radius:15px;padding:17px;margin:12px 0}.login{max-width:420px;margin:55px auto}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.stat{background:#edf2ff;padding:14px;border-radius:12px}.stat b{display:block;font-size:23px}.tabs{display:flex;gap:8px;overflow:auto;margin:14px 0}.btn,button{border:0;border-radius:9px;padding:10px 13px;font:inherit;font-weight:700;cursor:pointer}.primary{background:#2457d6;color:white}.soft{background:#eaf0ff;color:#2457d6}.danger{background:#ffe9e9;color:#a52222}input,select{width:100%;padding:11px;border:1px solid #dce2ed;border-radius:8px;font:inherit}.field{display:grid;gap:6px;margin:10px 0}.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.table{width:100%;border-collapse:collapse}.table th,.table td{text-align:left;padding:10px;border-bottom:1px solid #e7ebf2;font-size:13px}.hidden{display:none!important}.note{background:#fff5d9;color:#6c5010;padding:12px;border-radius:10px;font-size:13px}.item{border-bottom:1px solid #e8edf5;padding:12px 0}.item:last-child{border:0}@media(max-width:600px){.grid{grid-template-columns:1fr 1fr}.row{grid-template-columns:1fr}.table{min-width:550px}.scroll{overflow:auto}}
 </style></head><body>
-<header class="bar"><b>GITA ELECTRONICS · ADMIN</b><a href="./" style="color:white">← Website</a></header>
+<header class="bar"><b>GITA ELECTRONICS · ADMIN</b><div><button class="soft" onclick="logout()">Logout</button> <a href="./" style="color:white">← Website</a></div></header>
 <main class="wrap">
-<section id="loginCard" class="card login"><h2>Admin Login</h2><p>यह पेज Admin के लिए है।</p><label class="field">Admin Password / PIN<input id="pass" type="password" placeholder="Password डालें"></label><button class="primary" style="width:100%" onclick="login()">Login</button><p class="note">पहली बार का PIN: 1234। लॉगिन के बाद इसे बदलें।</p></section>
+<section id="loginCard" class="card login"><h2>Admin Login</h2><p>अपने Firebase Admin Account से लॉगिन करें।</p><label class="field">Admin Email<input id="email" type="email" autocomplete="username" placeholder="Admin Email" required></label><label class="field">Password<input id="pass" type="password" autocomplete="current-password" placeholder="Password डालें" required></label><button class="primary" style="width:100%" onclick="login()">Login</button><p id="loginError" class="note">Firebase Authentication में बनाया गया Email और Password इस्तेमाल करें।</p></section>
 <section id="app" class="hidden">
 <div class="grid"><div class="stat">कुल Products<b id="pc">0</b></div><div class="stat">कुल Orders<b id="oc">0</b></div><div class="stat">कुल Order Value<b id="sales">₹0</b></div></div>
 <nav class="tabs"><button class="primary" onclick="show('products')">Products & Stock</button><button class="soft" onclick="show('orders')">Orders</button><button class="soft" onclick="show('settings')">Settings</button></nav>
 <section id="products" class="card"><h2>Products & Stock</h2><button class="primary" onclick="editor()">+ नया Product</button><div id="editBox" class="hidden"></div><div class="scroll"><table class="table"><thead><tr><th>नाम</th><th>Category</th><th>Price</th><th>Stock</th><th>Action</th></tr></thead><tbody id="productRows"></tbody></table></div></section>
 <section id="orders" class="card hidden"><h2>Customer Orders</h2><div id="orderRows"></div></section>
-<section id="settings" class="card hidden"><h2>Admin Settings</h2><label class="field">नया Password / PIN<input id="newpass" type="password" minlength="4" placeholder="कम से कम 4 अक्षर"></label><button class="primary" onclick="changePassword()">Password बदलें</button><p class="note">Backup केवल इस ब्राउज़र में मौजूद डेटा का होगा। सुरक्षित और सभी डिवाइस पर साझा मैनेजमेंट के लिए Cloud Database और server-side login अभी जोड़ना बाकी है।</p><button class="soft" onclick="backup()">डेटा Backup डाउनलोड करें</button></section>
+<section id="settings" class="card hidden"><h2>Admin Settings</h2><label class="field">नया Password / PIN<input id="newpass" type="password" minlength="4" placeholder="कम से कम 4 अक्षर"></label><button class="primary" onclick="changePassword()">Password बदलें</button><p class="note">Products और Orders Firebase Cloud Database में सेव होते हैं और Admin लॉगिन के बाद सभी डिवाइस पर दिखाई देंगे।</p><button class="soft" onclick="backup()">डेटा Backup डाउनलोड करें</button></section>
 </section></main>
-<script>
-const seed=[{id:1,name:"Android Smartphone",cat:"Mobiles",price:9999,stock:8,icon:"📱"},{id:2,name:"LED Smart TV",cat:"TV",price:18999,stock:5,icon:"📺"},{id:3,name:"1.5 Ton Split AC",cat:"AC",price:32999,stock:4,icon:"❄️"},{id:4,name:"Double Door Refrigerator",cat:"Refrigerator",price:24999,stock:3,icon:"🧊"},{id:5,name:"Washing Machine",cat:"Washing Machine",price:15999,stock:6,icon:"🫧"},{id:6,name:"Bluetooth Speaker",cat:"Accessories",price:1999,stock:12,icon:"🔊"},{id:7,name:"Laptop",cat:"Laptop",price:42999,stock:2,icon:"💻"},{id:8,name:"Induction Cooktop",cat:"Kitchen",price:2499,stock:7,icon:"🍳"}];
-let products=JSON.parse(localStorage.ge_products||"null")||seed,orders=JSON.parse(localStorage.ge_orders||"[]"),pin=localStorage.ge_pin||"1234",editing=0;
-const $=id=>document.getElementById(id),money=n=>"₹"+Number(n||0).toLocaleString("en-IN"),esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-function save(){localStorage.ge_products=JSON.stringify(products);localStorage.ge_orders=JSON.stringify(orders)}
-function login(){if($("pass").value!==pin)return alert("गलत Password / PIN");$("loginCard").classList.add("hidden");$("app").classList.remove("hidden");refresh()}
-function show(id){["products","orders","settings"].forEach(x=>$(x).classList.toggle("hidden",x!==id));refresh()}
-function refresh(){$("pc").textContent=products.length;$("oc").textContent=orders.length;$("sales").textContent=money(orders.filter(o=>o.status!=="Cancelled").reduce((s,o)=>s+Number(o.total||0),0));$("productRows").innerHTML=products.map(p=>'<tr><td>'+esc(p.name)+'</td><td>'+esc(p.cat)+'</td><td>'+money(p.price)+'</td><td>'+p.stock+'</td><td><button class="soft" onclick="editor('+p.id+')">Edit</button> <button class="danger" onclick="removeProduct('+p.id+')">Delete</button></td></tr>').join("");$("orderRows").innerHTML=orders.map(o=>'<div class="item"><b>'+esc(o.id)+' · '+esc(o.name)+' · '+money(o.total)+'</b><p>'+esc(o.phone)+' | '+esc(o.date)+' | '+esc(o.payment)+'</p><p>'+((o.items||[]).map(x=>esc(x.name)+" × "+x.qty).join(", "))+'</p><p>'+esc(o.address)+'</p><label class="field">Order Status<select onchange="setStatus(\''+esc(o.id)+'\',this.value)">'+["नया","Confirmed","Processing","Delivered","Cancelled"].map(s=>'<option '+(o.status===s?'selected':'')+'>'+s+'</option>').join("")+'</select></label></div>').join("")||"अभी कोई ऑर्डर नहीं"}
-function editor(id=0){editing=id;let p=products.find(x=>x.id===id)||{name:"",cat:"Mobiles",price:0,stock:0,icon:"📦"};$("editBox").classList.remove("hidden");$("editBox").innerHTML='<h3>'+(id?"Product Edit":"नया Product")+'</h3><div class="row"><label class="field">Product Name<input id="pn" value="'+esc(p.name)+'"></label><label class="field">Category<input id="cat" value="'+esc(p.cat)+'"></label><label class="field">Price<input id="price" type="number" min="0" value="'+p.price+'"></label><label class="field">Stock<input id="stock" type="number" min="0" value="'+p.stock+'"></label><label class="field">Icon / Emoji<input id="icon" value="'+esc(p.icon)+'"></label></div><button class="primary" onclick="saveProduct()">Save Product</button> <button class="soft" onclick="$(\'editBox\').classList.add(\'hidden\')">Cancel</button>';$("editBox").scrollIntoView({behavior:"smooth",block:"center"})}
-function saveProduct(){let p={id:editing||Date.now(),name:$("pn").value.trim(),cat:$("cat").value.trim()||"Other",price:Number($("price").value),stock:Number($("stock").value),icon:$("icon").value||"📦"};if(!p.name||p.price<0||p.stock<0)return alert("सही जानकारी भरें");if(editing)products[products.findIndex(x=>x.id===editing)]=p;else products.push(p);save();$("editBox").classList.add("hidden");refresh()}
-function removeProduct(id){if(confirm("यह Product हटाएँ?")){products=products.filter(p=>p.id!==id);save();refresh()}}
-function setStatus(id,s){let o=orders.find(x=>x.id===id);if(o){o.status=s;save();refresh()}}
-function changePassword(){let p=$("newpass").value;if(p.length<4)return alert("कम से कम 4 अक्षर रखें");pin=p;localStorage.ge_pin=p;$("newpass").value="";alert("Password बदल गया")}
-function backup(){let a=document.createElement("a"),u=URL.createObjectURL(new Blob([JSON.stringify({products,orders},null,2)],{type:"application/json"}));a.href=u;a.download="gita-electronics-backup.json";a.click();URL.revokeObjectURL(u)}
+<script type="module">
+import { auth, db } from "./firebase.js";
+import { signInWithEmailAndPassword, onAuthStateChanged, signOut, updatePassword } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+const ADMIN_UID = "qFmcN7WpU4Xx4Ku29ak1UIzyU2F3";
+const $ = id => document.getElementById(id);
+const money = n => "₹"+Number(n||0).toLocaleString("en-IN");
+const esc = s => String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let products=[], orders=[], editing=null, stopProducts=null, stopOrders=null;
+const seed=[
+{name:"Android Smartphone",cat:"Mobiles",price:9999,stock:8,icon:"📱"},
+{name:"LED Smart TV",cat:"TV",price:18999,stock:5,icon:"📺"},
+{name:"1.5 Ton Split AC",cat:"AC",price:32999,stock:4,icon:"❄️"},
+{name:"Double Door Refrigerator",cat:"Refrigerator",price:24999,stock:3,icon:"🧊"},
+{name:"Washing Machine",cat:"Washing Machine",price:15999,stock:6,icon:"🫧"},
+{name:"Bluetooth Speaker",cat:"Accessories",price:1999,stock:12,icon:"🔊"},
+{name:"Laptop",cat:"Laptop",price:42999,stock:2,icon:"💻"},
+{name:"Induction Cooktop",cat:"Kitchen",price:2499,stock:7,icon:"🍳"}
+];
+async function login(){
+  $("loginError").textContent="लॉगिन हो रहा है...";
+  try{await signInWithEmailAndPassword(auth,$("email").value.trim(),$("pass").value);}
+  catch(e){console.error(e);$("loginError").textContent="लॉगिन नहीं हुआ: Email और Password जाँचें। ("+e.code+")";}
+}
+async function logout(){await signOut(auth);}
+onAuthStateChanged(auth,async user=>{
+  if(!user){stopProducts?.();stopOrders?.();$("loginCard").classList.remove("hidden");$("app").classList.add("hidden");return;}
+  if(user.uid!==ADMIN_UID){alert("इस Account को Admin की अनुमति नहीं है।");await signOut(auth);return;}
+  $("loginCard").classList.add("hidden");$("app").classList.remove("hidden");
+  await seedIfEmpty();
+  watchData();
+});
+async function seedIfEmpty(){
+  const snap=await getDocs(collection(db,"products"));
+  if(snap.empty){for(const p of seed)await addDoc(collection(db,"products"),p);}
+}
+function watchData(){
+  stopProducts?.();stopOrders?.();
+  stopProducts=onSnapshot(collection(db,"products"),snap=>{products=snap.docs.map(d=>({id:d.id,...d.data()}));refresh();},e=>alert("Products load नहीं हुए: "+e.message));
+  stopOrders=onSnapshot(collection(db,"orders"),snap=>{orders=snap.docs.map(d=>({id:d.id,...d.data()}));refresh();},e=>alert("Orders load नहीं हुए: "+e.message));
+}
+function show(id){["products","orders","settings"].forEach(x=>$(x).classList.toggle("hidden",x!==id));refresh();}
+function refresh(){
+  $("pc").textContent=products.length;$("oc").textContent=orders.length;
+  $("sales").textContent=money(orders.filter(o=>o.status!=="Cancelled").reduce((s,o)=>s+Number(o.total||0),0));
+  $("productRows").innerHTML=products.map(p=>'<tr><td>'+esc(p.name)+'</td><td>'+esc(p.cat)+'</td><td>'+money(p.price)+'</td><td>'+Number(p.stock||0)+'</td><td><button class="soft" data-edit="'+esc(p.id)+'">Edit</button> <button class="danger" data-delete="'+esc(p.id)+'">Delete</button></td></tr>').join("");
+  $("productRows").querySelectorAll("[data-edit]").forEach(b=>b.addEventListener("click",()=>editor(b.dataset.edit)));
+  $("productRows").querySelectorAll("[data-delete]").forEach(b=>b.addEventListener("click",()=>removeProduct(b.dataset.delete)));
+  $("orderRows").innerHTML=orders.map(o=>'<div class="item"><b>'+esc(o.id)+' · '+esc(o.name)+' · '+money(o.total)+'</b><p>'+esc(o.phone)+' | '+esc(o.date)+' | '+esc(o.payment)+'</p><p>'+((o.items||[]).map(x=>esc(x.name)+" × "+x.qty).join(", "))+'</p><p>'+esc(o.address)+'</p><label class="field">Order Status<select data-status="'+esc(o.id)+'">'+["नया","Confirmed","Processing","Delivered","Cancelled"].map(s=>'<option '+(o.status===s?'selected':'')+'>'+s+'</option>').join("")+'</select></label></div>').join("")||"अभी कोई ऑर्डर नहीं";
+  $("orderRows").querySelectorAll("[data-status]").forEach(s=>s.addEventListener("change",()=>setStatus(s.dataset.status,s.value)));
+}
+function editor(id=null){
+  editing=id;const p=products.find(x=>x.id===id)||{name:"",cat:"Mobiles",price:0,stock:0,icon:"📦"};
+  $("editBox").classList.remove("hidden");
+  $("editBox").innerHTML='<h3>'+(id?"Product Edit":"नया Product")+'</h3><div class="row"><label class="field">Product Name<input id="pn" value="'+esc(p.name)+'"></label><label class="field">Category<input id="cat" value="'+esc(p.cat)+'"></label><label class="field">Price<input id="price" type="number" min="0" value="'+Number(p.price||0)+'"></label><label class="field">Stock<input id="stock" type="number" min="0" value="'+Number(p.stock||0)+'"></label><label class="field">Icon / Emoji<input id="icon" value="'+esc(p.icon||"📦")+'"></label></div><button class="primary" onclick="saveProduct()">Save Product</button> <button class="soft" onclick="cancelEditor()">Cancel</button>';
+  $("editBox").scrollIntoView({behavior:"smooth",block:"center"});
+}
+function cancelEditor(){$("editBox").classList.add("hidden");}
+async function saveProduct(){
+  const p={name:$("pn").value.trim(),cat:$("cat").value.trim()||"Other",price:Number($("price").value),stock:Number($("stock").value),icon:$("icon").value||"📦"};
+  if(!p.name||!Number.isFinite(p.price)||p.price<0||!Number.isFinite(p.stock)||p.stock<0)return alert("सही जानकारी भरें");
+  try{if(editing)await updateDoc(doc(db,"products",editing),p);else await addDoc(collection(db,"products"),p);cancelEditor();}
+  catch(e){alert("Product सेव नहीं हुआ: "+e.message);}
+}
+async function removeProduct(id){if(!confirm("यह Product हटाएँ?"))return;try{await deleteDoc(doc(db,"products",id));}catch(e){alert("Delete नहीं हुआ: "+e.message);}}
+async function setStatus(id,status){try{await updateDoc(doc(db,"orders",id),{status});}catch(e){alert("Status अपडेट नहीं हुआ: "+e.message);}}
+async function changePassword(){
+  const p=$("newpass").value;if(p.length<6)return alert("Password कम से कम 6 अक्षर का रखें।");
+  try{await updatePassword(auth.currentUser,p);$("newpass").value="";alert("Password बदल गया।");}
+  catch(e){alert("Password बदलने के लिए दोबारा Login करना पड़ सकता है: "+e.message);}
+}
+function backup(){const a=document.createElement("a"),u=URL.createObjectURL(new Blob([JSON.stringify({products,orders},null,2)],{type:"application/json"}));a.href=u;a.download="gita-electronics-backup.json";a.click();URL.revokeObjectURL(u);}
+window.login=login;window.logout=logout;window.show=show;window.editor=editor;window.saveProduct=saveProduct;window.cancelEditor=cancelEditor;window.changePassword=changePassword;window.backup=backup;
 </script></body></html>
