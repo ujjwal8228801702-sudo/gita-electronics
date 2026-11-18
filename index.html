@@ -91,7 +91,7 @@ function drawCart(){
   cartRows.querySelectorAll("[data-plus]").forEach(b=>b.addEventListener("click",()=>changeQty(b.dataset.plus,1)));
 }
 function changeQty(id,d){const p=products.find(x=>x.id===id);cart[id]=(cart[id]||0)+d;if(cart[id]<=0)delete cart[id];if(p&&cart[id]>Number(p.stock||0))cart[id]=Number(p.stock||0);saveCart();drawCart();render();}
-function checkout(){if(!Object.keys(cart).length)return alert("Cart खाली है");closeM("cartModal");if(customerUser?.phoneNumber){cphone.value=customerUser.phoneNumber.replace(/^\\+91/,"");cphone.readOnly=true;}checkoutModal.classList.add("show");}
+function checkout(){if(!Object.keys(cart).length)return alert("Cart खाली है");closeM("cartModal");if(customerUser?.phoneNumber){cphone.value=customerUser.phoneNumber.replace(/^\+91/,"");cphone.readOnly=true;}checkoutModal.classList.add("show");}
 async function placeOrder(e){
   e.preventDefault();
   const items=Object.entries(cart).map(([id,q])=>{const p=products.find(x=>x.id===id);return p?{productId:p.id,name:p.name,price:Number(p.price),qty:q}:null;}).filter(Boolean);
@@ -132,6 +132,7 @@ async function verifyCustomerOtp(){
 async function customerLogout(){if(!confirm("क्या आप Logout करना चाहते हैं?"))return;await signOut(auth);}
 onAuthStateChanged(auth,user=>{
  customerUser=user;$("customerLogin").style.display=user?"none":"flex";$("siteApp").classList.toggle("hide",!user);
+ if(user&&!user.phoneNumber){signOut(auth);return;}
  if(user&&user.phoneNumber){cphone.value=user.phoneNumber.replace(/^\+91/,"");cphone.readOnly=true;}
  if(!user){confirmationResult=null;resetCustomerOtp();}
 });
