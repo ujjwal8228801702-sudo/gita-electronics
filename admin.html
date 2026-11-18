@@ -84,7 +84,7 @@ async function setStatus(id,status){try{await updateDoc(doc(db,"orders",id),{sta
 function printBill(id){
   const o=orders.find(x=>x.id===id);if(!o)return alert("ऑर्डर नहीं मिला।");
   const total=Number(o.total||0);
-  const taxable=total/1.18,sgst=taxable*0.09,cgst=taxable*0.09;
+  const taxable=total/1.18,sgst=Math.round(taxable*0.09*100)/100,cgst=Math.round((total-taxable-sgst)*100)/100;
   const fmt=n=>"₹"+Number(n||0).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});
   const rows=(o.items||[]).map(x=>'<tr><td>'+esc(x.name)+'</td><td>'+Number(x.qty||0)+'</td><td>'+fmt(x.price)+'</td><td>'+fmt(Number(x.price||0)*Number(x.qty||0))+'</td></tr>').join("");
   const payment=String(o.payment||"").replace(/\\s*\\(भुगतान की पुष्टि दुकान करेगी\\)/g,"").trim();
