@@ -36,16 +36,27 @@ main{max-width:1180px}.head{margin:30px 0 15px}.head h2{letter-spacing:-.6px}
 .product>.body>.price{order:3}
 @media(max-width:600px){.product>.photo{height:155px}.product>.body>.specs{font-size:11px;padding:7px}}
 </style></head><body>
+<div id="customerLogin" style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(135deg,#0b1430,#3157c8)">
+<div style="background:white;width:min(420px,100%);padding:26px;border-radius:22px;box-shadow:0 25px 70px #0003">
+<div style="font-size:27px;font-weight:900;color:#101a36;text-align:center">GITA <span style="color:#3157e8">ELECTRONICS</span></div>
+<p style="text-align:center;color:#68748a;margin:8px 0 22px">आगे बढ़ने के लिए मोबाइल OTP से Login करें</p>
+<label class="field">मोबाइल नंबर<div style="display:flex;align-items:center;gap:8px"><b style="padding:12px;background:#f1f4fb;border-radius:10px">+91</b><input id="customerPhone" type="tel" inputmode="numeric" maxlength="10" placeholder="10 अंकों का मोबाइल नंबर" autocomplete="tel-national"></div></label>
+<button id="sendOtpBtn" class="primary" style="width:100%;margin-top:8px" onclick="sendCustomerOtp()">OTP भेजें</button>
+<div id="otpArea" class="hide"><label class="field">SMS में आया OTP<input id="customerOtp" type="text" inputmode="numeric" maxlength="6" placeholder="6 अंकों का OTP" autocomplete="one-time-code"></label><button id="verifyOtpBtn" class="primary" style="width:100%" onclick="verifyCustomerOtp()">Verify करके Login करें</button><button class="soft" style="width:100%;margin-top:8px" onclick="resetCustomerOtp()">मोबाइल नंबर बदलें</button></div>
+<div id="recaptcha-container"></div><p id="customerLoginMsg" class="muted" style="text-align:center;margin-top:14px">आपके मोबाइल पर OTP भेजा जाएगा।</p><p class="muted" style="text-align:center;font-size:11px">आपका मोबाइल नंबर आपके ऑर्डर के साथ उपयोग होगा।</p>
+</div></div><div id="siteApp" class="hide">
 <div class="top"><span>📍 Phokra Chowk, Dumka</span><span>📞 सहायता: 9546400800</span></div>
-<nav class="nav"><div class="brand">GITA <span>ELECTRONICS</span></div><div class="search"><input id="search" placeholder="Mobile, TV, AC, Fridge खोजें" oninput="render()"><button class="primary" onclick="render()">खोजें</button></div><button class="soft" onclick="openCart()">🛒 <b id="count">0</b></button><button class="dark" onclick="location.href='admin.html'">Admin Login</button></nav>
+<nav class="nav"><div class="brand">GITA <span>ELECTRONICS</span></div><div class="search"><input id="search" placeholder="Mobile, TV, AC, Fridge खोजें" oninput="render()"><button class="primary" onclick="render()">खोजें</button></div><button class="soft" onclick="openCart()">🛒 <b id="count">0</b></button><button class="dark" onclick="location.href='admin.html'">Admin Login</button><button class="soft" onclick="customerLogout()">Logout</button></nav>
 <section class="hero"><div><div class="tag">SMART SHOPPING • GREAT DEALS</div><h1>आपकी पसंद,<br>आपकी अपनी दुकान!</h1><p>Mobile, TV, AC, Refrigerator, Washing Machine और बहुत कुछ।</p><button style="background:var(--gold);color:#17213a" onclick="document.getElementById('products').scrollIntoView({behavior:'smooth'})">प्रोडक्ट देखें ↓</button></div><div class="hero-art">📱 📺</div></section>
 <main><div class="head"><h2>हमारे प्रोडक्ट्स</h2><span class="muted" id="results"></span></div><div class="cats" id="cats"></div><div class="grid" id="products"></div></main>
 <footer class="footer"><b>GITA ELECTRONICS</b><p>Phokra Chowk, Dumka</p><small>© <span id="year"></span> Gita Electronics</small></footer>
 <div class="modal" id="cartModal"><div class="panel"><div class="panelhead"><h2>आपका Cart</h2><button onclick="closeM('cartModal')">✕</button></div><div id="cartRows"></div><p><b>कुल: <span id="total">₹0</span></b></p><button class="primary" style="width:100%" onclick="checkout()">Checkout</button></div></div>
 <div class="modal" id="checkoutModal"><div class="panel"><div class="panelhead"><h2>ऑर्डर की जानकारी</h2><button onclick="closeM('checkoutModal')">✕</button></div><form onsubmit="placeOrder(event)"><div class="row"><label class="field">नाम<input id="cname" required></label><label class="field">मोबाइल<input id="cphone" required pattern="[0-9]{10}" inputmode="numeric"></label></div><label class="field">पूरा पता<textarea id="caddress" required></textarea></label><label class="field">पेमेंट<select id="payment"><option>Cash on Delivery</option><option>UPI / Online (भुगतान की पुष्टि दुकान करेगी)</option></select></label><p class="notice">ऑर्डर भेजने पर दुकान की टीम फोन से पुष्टि करेगी। वास्तविक ऑनलाइन पेमेंट के लिए Payment Gateway जोड़ना बाकी है।</p><button class="primary" style="width:100%">ऑर्डर भेजें</button></form></div></div>
 <div class="modal" id="adminModal"><div class="panel"><div class="panelhead"><h2>Admin Dashboard</h2><button onclick="closeM('adminModal')">✕</button></div><div id="login"><p class="muted">पहली बार का PIN: 1234 — लॉगिन के बाद बदलें।</p><input id="pinInput" type="password" placeholder="Admin PIN"><button class="primary" onclick="login()">Login</button></div><div id="dashboard" class="hide"><div class="tabs"><button class="tab active" onclick="tab('inventory',this)">Products & Stock</button><button class="tab" onclick="tab('orders',this)">Orders</button><button class="tab" onclick="tab('settings',this)">Settings</button></div><section id="inventory"><button class="primary" onclick="editProduct()">+ Product जोड़ें</button> <button class="soft" onclick="backup()">Backup</button><div id="inventoryRows"></div><div id="editor" class="hide"></div></section><section id="orders" class="hide"></section><section id="settings" class="hide"><label class="field">नया Admin PIN<input id="newPin" type="password"></label><button class="primary" onclick="changePin()">PIN बदलें</button><p class="notice">यह प्रारंभिक संस्करण डेटा इसी ब्राउज़र में सेव करता है। सभी ग्राहकों और Admin के बीच साझा ऑर्डर/स्टॉक के लिए ऑनलाइन Database जोड़ना जरूरी है।</p></section></div></div></div>
+</div>
 <script type="module">
-import { db } from "./firebase.js";
+import { auth, db } from "./firebase.js";
+import { RecaptchaVerifier, signInWithPhoneNumber, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 import { collection, onSnapshot, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 const $ = id => document.getElementById(id);
@@ -54,6 +65,7 @@ const results = $("results"), count = $("count"), cartModal = $("cartModal");
 const cartRows = $("cartRows"), total = $("total"), checkoutModal = $("checkoutModal");
 const cname = $("cname"), cphone = $("cphone"), caddress = $("caddress"), payment = $("payment");
 let products = [], cart = JSON.parse(localStorage.ge_cart || "{}"), category = "All";
+let confirmationResult = null, recaptchaVerifier = null, customerUser = null;
 const money = n => "₹" + Number(n || 0).toLocaleString("en-IN");
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const saveCart = () => { localStorage.ge_cart = JSON.stringify(cart); };
@@ -79,14 +91,14 @@ function drawCart(){
   cartRows.querySelectorAll("[data-plus]").forEach(b=>b.addEventListener("click",()=>changeQty(b.dataset.plus,1)));
 }
 function changeQty(id,d){const p=products.find(x=>x.id===id);cart[id]=(cart[id]||0)+d;if(cart[id]<=0)delete cart[id];if(p&&cart[id]>Number(p.stock||0))cart[id]=Number(p.stock||0);saveCart();drawCart();render();}
-function checkout(){if(!Object.keys(cart).length)return alert("Cart खाली है");closeM("cartModal");checkoutModal.classList.add("show");}
+function checkout(){if(!Object.keys(cart).length)return alert("Cart खाली है");closeM("cartModal");if(customerUser?.phoneNumber){cphone.value=customerUser.phoneNumber.replace(/^\\+91/,"");cphone.readOnly=true;}checkoutModal.classList.add("show");}
 async function placeOrder(e){
   e.preventDefault();
   const items=Object.entries(cart).map(([id,q])=>{const p=products.find(x=>x.id===id);return p?{productId:p.id,name:p.name,price:Number(p.price),qty:q}:null;}).filter(Boolean);
   if(!items.length)return alert("Cart खाली है");
   for(const x of items){const p=products.find(y=>y.id===x.productId);if(!p||Number(p.stock||0)<x.qty)return alert("स्टॉक बदल गया है। कृपया Cart अपडेट करें।");}
   const totalAmt=items.reduce((s,x)=>s+x.price*x.qty,0);
-  const order={date:new Date().toLocaleString("en-IN"),createdAt:serverTimestamp(),name:cname.value.trim(),phone:cphone.value.trim(),address:caddress.value.trim(),payment:payment.value,status:"नया",items,total:totalAmt};
+  const order={date:new Date().toLocaleString("en-IN"),createdAt:serverTimestamp(),name:cname.value.trim(),phone:customerUser?.phoneNumber||cphone.value.trim(),address:caddress.value.trim(),payment:payment.value,status:"नया",items,total:totalAmt};
   try{
     const ref=await addDoc(collection(db,"orders"),order);
     cart={};saveCart();closeM("checkoutModal");render();
@@ -94,10 +106,41 @@ async function placeOrder(e){
     window.open("https://wa.me/919546400800?text="+encodeURIComponent("नया ऑर्डर "+ref.id+" | "+order.name+" | "+order.phone+" | "+items.map(x=>x.name+" x "+x.qty).join(", ")+" | कुल "+money(totalAmt)),"_blank");
   }catch(err){console.error(err);alert("ऑर्डर सेव नहीं हुआ। कृपया इंटरनेट और Firebase Rules जाँचें।");}
 }
+
+function setLoginMessage(message,isError=false){$("customerLoginMsg").textContent=message;$("customerLoginMsg").style.color=isError?"#b42318":"#68748a";}
+function resetCustomerOtp(){confirmationResult=null;$("otpArea").classList.add("hide");$("customerOtp").value="";$("customerPhone").readOnly=false;$("sendOtpBtn").classList.remove("hide");setLoginMessage("मोबाइल नंबर जाँचकर OTP भेजें।");}
+async function sendCustomerOtp(){
+ const phone=$("customerPhone").value.replace(/\D/g,"");
+ if(!/^[6-9]\d{9}$/.test(phone)){setLoginMessage("कृपया सही 10 अंकों का भारतीय मोबाइल नंबर डालें।",true);return;}
+ $("sendOtpBtn").disabled=true;setLoginMessage("OTP भेजा जा रहा है...");
+ try{
+  if(!recaptchaVerifier)recaptchaVerifier=new RecaptchaVerifier(auth,"recaptcha-container",{size:"invisible"});
+  confirmationResult=await signInWithPhoneNumber(auth,"+91"+phone,recaptchaVerifier);
+  $("customerPhone").readOnly=true;$("otpArea").classList.remove("hide");$("sendOtpBtn").classList.add("hide");
+  setLoginMessage("+91 "+phone+" पर OTP भेज दिया गया है।");$("customerOtp").focus();
+ }catch(error){console.error(error);setLoginMessage("OTP नहीं भेजा गया: "+(error.code||error.message)+"। Firebase Authorized domains और Phone सेटिंग जाँचें।",true);if(recaptchaVerifier){try{recaptchaVerifier.clear();}catch(e){}recaptchaVerifier=null;}}
+ finally{$("sendOtpBtn").disabled=false;}
+}
+async function verifyCustomerOtp(){
+ const code=$("customerOtp").value.trim();
+ if(!confirmationResult||!/^\d{6}$/.test(code)){setLoginMessage("6 अंकों का सही OTP डालें।",true);return;}
+ $("verifyOtpBtn").disabled=true;setLoginMessage("OTP verify हो रहा है...");
+ try{await confirmationResult.confirm(code);confirmationResult=null;setLoginMessage("Login सफल। वेबसाइट खुल रही है...");}
+ catch(error){console.error(error);setLoginMessage("OTP गलत या expire हो गया है। दोबारा जाँचें।",true);}
+ finally{$("verifyOtpBtn").disabled=false;}
+}
+async function customerLogout(){if(!confirm("क्या आप Logout करना चाहते हैं?"))return;await signOut(auth);}
+onAuthStateChanged(auth,user=>{
+ customerUser=user;$("customerLogin").style.display=user?"none":"flex";$("siteApp").classList.toggle("hide",!user);
+ if(user&&user.phoneNumber){cphone.value=user.phoneNumber.replace(/^\+91/,"");cphone.readOnly=true;}
+ if(!user){confirmationResult=null;resetCustomerOtp();}
+});
+
 function closeM(id){$(id).classList.remove("show");}
 $("year").textContent=new Date().getFullYear();
 search.addEventListener("input",render);
 onSnapshot(collection(db,"products"), snap=>{products=snap.docs.map(d=>({id:d.id,...d.data()}));render();}, err=>{console.error(err);results.textContent="Database से कनेक्शन नहीं हुआ";});
 window.openCart=openCart;window.checkout=checkout;window.placeOrder=placeOrder;window.closeM=closeM;
+window.sendCustomerOtp=sendCustomerOtp;window.verifyCustomerOtp=verifyCustomerOtp;window.resetCustomerOtp=resetCustomerOtp;window.customerLogout=customerLogout;
 render();
 </script></body></html>
