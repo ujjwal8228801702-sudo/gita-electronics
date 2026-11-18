@@ -81,7 +81,7 @@ function refresh(){
   $("productRows").innerHTML=products.map(p=>'<tr><td>'+esc(p.name)+'</td><td>'+esc(p.cat)+'</td><td>'+money(p.price)+'</td><td>'+Number(p.stock||0)+'</td><td><button class="soft" data-edit="'+esc(p.id)+'">Edit</button> <button class="danger" data-delete="'+esc(p.id)+'">Delete</button></td></tr>').join("");
   $("productRows").querySelectorAll("[data-edit]").forEach(b=>b.addEventListener("click",()=>editor(b.dataset.edit)));
   $("productRows").querySelectorAll("[data-delete]").forEach(b=>b.addEventListener("click",()=>removeProduct(b.dataset.delete)));
-  $("orderRows").innerHTML=orders.map(o=>'<div class="item"><b>'+esc(o.id)+' · '+esc(o.name)+' · '+money(o.total)+'</b><p>'+esc(o.phone)+' | '+esc(o.date)+' | '+esc(o.payment)+'</p><p>'+((o.items||[]).map(x=>esc(x.name)+" × "+x.qty).join(", "))+'</p><p>'+esc(o.address)+'</p><button class="primary" data-bill="'+esc(o.id)+'">🧾 बिल बनाएँ / Print Bill</button><label class="field">Order Status<select data-status="'+esc(o.id)+'">'+["Pending","Confirmed","Processing","Shipped","Delivered","Cancelled"].map(s=>'<option '+(o.status===s?'selected':'')+'>'+s+'</option>').join("")+'</select></label></div>').join("")||"अभी कोई ऑर्डर नहीं";
+  $("orderRows").innerHTML=orders.map(o=>'<div class="item"><b>'+esc(o.id)+' · '+esc(o.name)+' · '+money(o.total)+'</b><p>'+esc(o.phone)+' | '+esc(o.date)+' | '+esc(o.payment)+'</p><p>'+((o.items||[]).map(x=>esc(x.name)+" × "+x.qty).join(", "))+'</p><p>'+esc(o.address)+'</p><div class="note" style="margin:8px 0">'+((o.items||[]).map(x=>'<div><b>'+esc(x.name)+'</b> — IMEI / Serial No.: '+esc(x.imeiSerial||"अभी दर्ज नहीं")+'</div>').join(""))+'</div><button class="primary" data-bill="'+esc(o.id)+'">🧾 बिल बनाएँ / Print Bill</button><label class="field">Order Status<select data-status="'+esc(o.id)+'">'+["Pending","Confirmed","Processing","Shipped","Delivered","Cancelled"].map(s=>'<option '+(o.status===s?'selected':'')+'>'+s+'</option>').join("")+'</select></label></div>').join("")||"अभी कोई ऑर्डर नहीं";
   $("orderRows").querySelectorAll("[data-status]").forEach(s=>s.addEventListener("change",()=>setStatus(s.dataset.status,s.value)));
   $("orderRows").querySelectorAll("[data-bill]").forEach(b=>b.addEventListener("click",()=>printBill(b.dataset.bill)));
 }
@@ -133,16 +133,23 @@ async function saveProduct(){
 }
 async function removeProduct(id){if(!confirm("यह Product हटाएँ?"))return;try{await deleteDoc(doc(db,"products",id));}catch(e){alert("Delete नहीं हुआ: "+e.message);}}
 async function setStatus(id,status){try{await updateDoc(doc(db,"orders",id),{status});}catch(e){alert("Status अपडेट नहीं हुआ: "+e.message);}}
-function printBill(id){
+async function printBill(id){
   const o=orders.find(x=>x.id===id);if(!o)return alert("ऑर्डर नहीं मिला।");
-  const serials=[];
+  const updatedItems=[];
   for(let i=0;i<(o.items||[]).length;i++){
     const x=o.items[i];
     const label=String(x.name||"Product")+" (Qty: "+Number(x.qty||0)+")";
-    const value=window.prompt(label+" का IMEI / Serial Number डालें। एक से अधिक हों तो comma से अलग लिखें। खाली छोड़ सकते हैं:", "");
+    const value=window.prompt(label+" का IMEI / Serial Number डालें। एक से अधिक हों तो comma से अलग लिखें। पहले से सेव नंबर दिखेंगे:", String(x.imeiSerial||""));
     if(value===null)return;
-    serials[i]=value.trim();
+    updatedItems.push({...x,imeiSerial:value.trim()});
   }
+  try{
+    await updateDoc(doc(db,"orders",id),{items:updatedItems,serialNumbersUpdatedAt:serverTimestamp()});
+  }catch(e){
+    alert("IMEI / Serial Number Firebase में सेव नहीं हुआ: "+e.message);
+    return;
+  }
+  const serials=updatedItems.map(x=>x.imeiSerial||"");
   const total=Number(o.total||0);
   const taxable=total/1.18,sgst=Math.round(taxable*0.09*100)/100,cgst=Math.round((total-taxable-sgst)*100)/100;
   const fmt=n=>"₹"+Number(n||0).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});
