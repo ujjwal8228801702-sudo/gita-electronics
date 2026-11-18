@@ -51,6 +51,19 @@ main{max-width:1180px}.head{margin:30px 0 15px}.head h2{letter-spacing:-.6px}
 #customerLogin>div>div:first-child:after{content:"GITA ELECTRONICS";font-size:21px;font-weight:950;letter-spacing:-.7px;color:#101a36}
 .footer>b{display:inline-block;font-size:20px;letter-spacing:1.2px;padding:9px 17px;border:1px solid #ffffff35;border-radius:12px;background:#ffffff0c}
 @media(max-width:600px){.brand:before{width:35px;height:35px;margin-right:8px}.brand:after{font-size:16px}#customerLogin>div>div:first-child:after{font-size:19px}}
+
+/* Customer side navigation drawer */
+.menu-trigger{font-size:23px;line-height:1;padding:9px 13px;min-width:44px}
+.drawer-backdrop{position:fixed;inset:0;background:#07112799;z-index:20;display:none}
+.drawer-backdrop.show{display:block}
+.side-drawer{position:absolute;right:0;top:0;height:100%;width:min(330px,88vw);background:#fff;padding:22px;box-shadow:-15px 0 40px #07112730;overflow:auto;animation:drawerIn .2s ease}
+@keyframes drawerIn{from{transform:translateX(30px);opacity:.6}to{transform:translateX(0);opacity:1}}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.drawer-brand{font-size:18px;font-weight:950;color:#101a36}
+.drawer-link{width:100%;display:flex;align-items:center;gap:12px;padding:14px 12px;margin:5px 0;text-align:left;background:#f6f8fc;color:#17213a;border:1px solid #edf0f6;border-radius:12px}
+.drawer-link span:first-child{font-size:20px;width:27px;text-align:center}
+.drawer-link small{display:block;color:#71809a;font-weight:500;margin-top:2px}
+.drawer-contact{background:#eef3ff;padding:13px;border-radius:12px;margin-top:15px;font-size:13px;line-height:1.7}
 </style></head><body>
 <div id="customerLogin" style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(135deg,#0b1430,#3157c8)">
 <div style="background:white;width:min(420px,100%);padding:26px;border-radius:22px;box-shadow:0 25px 70px #0003">
@@ -62,18 +75,19 @@ main{max-width:1180px}.head{margin:30px 0 15px}.head h2{letter-spacing:-.6px}
 <button class="soft" style="width:100%;margin-top:9px" onclick="customerLogin(true)">नया अकाउंट बनाएँ</button>
 <p id="customerLoginMsg" class="muted" style="text-align:center;margin-top:14px">नए ग्राहक पहले नया अकाउंट बनाएँ।</p><p class="muted" style="text-align:center;font-size:11px">यह लॉगिन SMS OTP के बिना है। मोबाइल नंबर की पहचान सत्यापित नहीं होती।</p>
 </div></div><div id="siteApp" class="hide">
-<nav class="nav"><div class="brand">GITA <span>ELECTRONICS</span><small class="brand-meta">📍 Phokra Chowk, Dumka&nbsp; | &nbsp;📞 9546400800</small></div><div class="search"><input id="search" placeholder="Mobile, TV, AC, Fridge खोजें" oninput="render()"><button class="primary" onclick="render()">खोजें</button></div><button class="soft" onclick="openCart()">🛒 <b id="count">0</b></button><button class="soft" onclick="customerLogout()">Logout</button></nav>
+<nav class="nav"><div class="brand">GITA <span>ELECTRONICS</span><small class="brand-meta">📍 Phokra Chowk, Dumka&nbsp; | &nbsp;📞 9546400800</small></div><div class="search"><input id="search" placeholder="Mobile, TV, AC, Fridge खोजें" oninput="render()"><button class="primary" onclick="render()">खोजें</button></div><button class="soft" onclick="openCart()">🛒 <b id="count">0</b></button><button class="soft menu-trigger" aria-label="Menu" onclick="toggleMenu(true)">☰</button></nav>
 <section class="hero"><div><div class="tag">SMART SHOPPING • GREAT DEALS</div><h1>आपकी पसंद,<br>आपकी अपनी दुकान!</h1><p>Mobile, TV, AC, Refrigerator, Washing Machine और बहुत कुछ।</p><button style="background:var(--gold);color:#17213a" onclick="document.getElementById('products').scrollIntoView({behavior:'smooth'})">प्रोडक्ट देखें ↓</button></div><div class="hero-art">📱 📺</div></section>
 <main><div class="head"><h2>हमारे प्रोडक्ट्स</h2><span class="muted" id="results"></span></div><div class="cats" id="cats"></div><div class="grid" id="products"></div></main>
 <footer class="footer"><b>GITA ELECTRONICS</b><p>Phokra Chowk, Dumka</p><small>© <span id="year"></span> Gita Electronics</small></footer>
 <div class="modal" id="cartModal"><div class="panel"><div class="panelhead"><h2>आपका Cart</h2><button onclick="closeM('cartModal')">✕</button></div><div id="cartRows"></div><p><b>कुल: <span id="total">₹0</span></b></p><button class="primary" style="width:100%" onclick="checkout()">Checkout</button></div></div>
 <div class="modal" id="checkoutModal"><div class="panel"><div class="panelhead"><h2>ऑर्डर की जानकारी</h2><button onclick="closeM('checkoutModal')">✕</button></div><form onsubmit="placeOrder(event)"><div class="row"><label class="field">नाम<input id="cname" required></label><label class="field">मोबाइल<input id="cphone" required pattern="[0-9]{10}" inputmode="numeric"></label></div><label class="field">पूरा पता<textarea id="caddress" required></textarea></label><label class="field">पेमेंट<select id="payment"><option>Cash on Delivery</option><option>UPI / Online (भुगतान की पुष्टि दुकान करेगी)</option></select></label><p class="notice">ऑर्डर भेजने पर दुकान की टीम फोन से पुष्टि करेगी। वास्तविक ऑनलाइन पेमेंट के लिए Payment Gateway जोड़ना बाकी है।</p><button class="primary" style="width:100%">ऑर्डर भेजें</button></form></div></div>
+<div class="drawer-backdrop" id="sideMenu" onclick="if(event.target===this)toggleMenu(false)"><aside class="side-drawer"><div class="drawer-head"><div class="drawer-brand">GITA ELECTRONICS</div><button class="soft" onclick="toggleMenu(false)">✕</button></div><button class="drawer-link" onclick="showCustomerOrders()"><span>🛍️</span><span>My Orders<small>मेरे सभी ऑर्डर देखें</small></span></button><button class="drawer-link" onclick="showCustomerOrders()"><span>📦</span><span>Track Order<small>ऑर्डर की स्थिति देखें</small></span></button><button class="drawer-link" onclick="showCustomerProfile()"><span>👤</span><span>My Profile<small>मोबाइल नंबर और अकाउंट</small></span></button><button class="drawer-link" onclick="contactStore()"><span>📞</span><span>Contact Us<small>दुकान से संपर्क करें</small></span></button><button class="drawer-link" onclick="showAboutStore()"><span>ℹ️</span><span>About Us<small>Gita Electronics के बारे में</small></span></button><div class="drawer-contact">📍 Phokra Chowk, Dumka<br>📞 9546400800</div><button class="drawer-link" style="margin-top:14px;color:#b42318" onclick="customerLogout()"><span>🚪</span><span>Logout<small>अपने अकाउंट से बाहर निकलें</small></span></button></aside></div><div class="modal" id="infoModal"><div class="panel"><div class="panelhead"><h2 id="infoTitle">जानकारी</h2><button onclick="closeM('infoModal')">✕</button></div><div id="infoContent"></div></div></div>
 <div class="modal" id="adminModal"><div class="panel"><div class="panelhead"><h2>Admin Dashboard</h2><button onclick="closeM('adminModal')">✕</button></div><div id="login"><p class="muted">पहली बार का PIN: 1234 — लॉगिन के बाद बदलें।</p><input id="pinInput" type="password" placeholder="Admin PIN"><button class="primary" onclick="login()">Login</button></div><div id="dashboard" class="hide"><div class="tabs"><button class="tab active" onclick="tab('inventory',this)">Products & Stock</button><button class="tab" onclick="tab('orders',this)">Orders</button><button class="tab" onclick="tab('settings',this)">Settings</button></div><section id="inventory"><button class="primary" onclick="editProduct()">+ Product जोड़ें</button> <button class="soft" onclick="backup()">Backup</button><div id="inventoryRows"></div><div id="editor" class="hide"></div></section><section id="orders" class="hide"></section><section id="settings" class="hide"><label class="field">नया Admin PIN<input id="newPin" type="password"></label><button class="primary" onclick="changePin()">PIN बदलें</button><p class="notice">यह प्रारंभिक संस्करण डेटा इसी ब्राउज़र में सेव करता है। सभी ग्राहकों और Admin के बीच साझा ऑर्डर/स्टॉक के लिए ऑनलाइन Database जोड़ना जरूरी है।</p></section></div></div></div>
 </div>
 <script type="module">
 import { auth, db } from "./firebase.js";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-import { collection, onSnapshot, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+import { collection, onSnapshot, addDoc, getDocs, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
 const $ = id => document.getElementById(id);
 const search = $("search"), catsEl = $("cats"), productsEl = $("products");
@@ -114,7 +128,7 @@ async function placeOrder(e){
   if(!items.length)return alert("Cart खाली है");
   for(const x of items){const p=products.find(y=>y.id===x.productId);if(!p||Number(p.stock||0)<x.qty)return alert("स्टॉक बदल गया है। कृपया Cart अपडेट करें।");}
   const totalAmt=items.reduce((s,x)=>s+x.price*x.qty,0);
-  const order={date:new Date().toLocaleString("en-IN"),createdAt:serverTimestamp(),name:cname.value.trim(),phone:customerPhoneNumber||cphone.value.trim(),address:caddress.value.trim(),payment:payment.value,status:"नया",items,total:totalAmt};
+  const order={customerUid:auth.currentUser?.uid||null,date:new Date().toLocaleString("en-IN"),createdAt:serverTimestamp(),name:cname.value.trim(),phone:customerPhoneNumber||cphone.value.trim(),address:caddress.value.trim(),payment:payment.value,status:"नया",items,total:totalAmt};
   try{
     const ref=await addDoc(collection(db,"orders"),order);
     cart={};saveCart();closeM("checkoutModal");render();
@@ -123,6 +137,19 @@ async function placeOrder(e){
   }catch(err){console.error(err);alert("ऑर्डर सेव नहीं हुआ। कृपया इंटरनेट और Firebase Rules जाँचें।");}
 }
 
+function toggleMenu(open){$("sideMenu").classList.toggle("show",open);}
+async function showCustomerOrders(){
+ toggleMenu(false);$("infoTitle").textContent="My Orders / Track Order";$("infoContent").innerHTML='<p class="muted">आपके ऑर्डर लोड हो रहे हैं...</p>';$("infoModal").classList.add("show");
+ try{
+  const uid=auth.currentUser?.uid;if(!uid)throw new Error("कृपया पहले Login करें।");
+  const snap=await getDocs(query(collection(db,"orders"),where("customerUid","==",uid)));
+  const rows=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+  $("infoContent").innerHTML=rows.length?rows.map(o=>'<div class="line" style="display:block"><b>Order: '+esc(o.id)+'</b><div class="muted">'+esc(o.date||"")+'</div><div>स्थिति: <b>'+esc(o.status||"Pending")+'</b></div><div class="muted">'+(o.items||[]).map(x=>esc(x.name)+' × '+Number(x.qty||1)).join(", ")+'</div><b>'+money(o.total)+'</b></div>').join(""):'<p>अभी आपका कोई ऑर्डर नहीं मिला है।</p>';
+ }catch(e){console.error(e);$("infoContent").innerHTML='<p class="notice">ऑर्डर अभी नहीं दिख पा रहे हैं। Firebase Firestore Rules में ग्राहक को अपने customerUid वाले ऑर्डर पढ़ने की अनुमति देनी होगी।</p>';}
+}
+function showCustomerProfile(){toggleMenu(false);$("infoTitle").textContent="My Profile";$("infoContent").innerHTML='<p><b>मोबाइल नंबर:</b> '+esc(customerPhoneNumber||"")+'</p><p class="muted">आपका अकाउंट मोबाइल नंबर और Password से बना है। Password बदलने के लिए अभी Firebase Password Reset सुविधा जोड़नी होगी।</p><p><b>दुकान:</b> Gita Electronics</p><p><b>पता:</b> Phokra Chowk, Dumka</p>';$("infoModal").classList.add("show");}
+function contactStore(){toggleMenu(false);window.location.href="tel:9546400800";}
+function showAboutStore(){toggleMenu(false);$("infoTitle").textContent="About Gita Electronics";$("infoContent").innerHTML='<p><b>GITA ELECTRONICS</b></p><p>आपकी अपनी इलेक्ट्रॉनिक्स दुकान।</p><p>📍 Phokra Chowk, Dumka</p><p>📞 9546400800</p>';$("infoModal").classList.add("show");}
 function setLoginMessage(message,isError=false){$("customerLoginMsg").textContent=message;$("customerLoginMsg").style.color=isError?"#b42318":"#68748a";}
 function phoneToAuthEmail(phone){return phone+"@customer.gita-electronics.invalid";}
 async function customerLogin(createAccount){
@@ -159,7 +186,7 @@ function closeM(id){$(id).classList.remove("show");}
 $("year").textContent=new Date().getFullYear();
 search.addEventListener("input",render);
 onSnapshot(collection(db,"products"), snap=>{products=snap.docs.map(d=>({id:d.id,...d.data()}));render();}, err=>{console.error(err);results.textContent="Database से कनेक्शन नहीं हुआ";});
-window.openCart=openCart;window.checkout=checkout;window.placeOrder=placeOrder;window.closeM=closeM;
+window.openCart=openCart;window.checkout=checkout;window.placeOrder=placeOrder;window.closeM=closeM;window.toggleMenu=toggleMenu;window.showCustomerOrders=showCustomerOrders;window.showCustomerProfile=showCustomerProfile;window.contactStore=contactStore;window.showAboutStore=showAboutStore;
 window.customerLogin=customerLogin;window.customerLogout=customerLogout;
 render();
 </script></body></html>
