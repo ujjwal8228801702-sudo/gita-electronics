@@ -125,6 +125,22 @@ main{max-width:1180px}.head{margin:30px 0 15px}.head h2{letter-spacing:-.6px}
 .hero-banner{max-width:1180px;margin:24px auto 26px;border-radius:22px;overflow:hidden;box-shadow:0 18px 42px #14264a22;background:#10264c;line-height:0}
 .hero-banner img{display:block;width:100%;height:auto;aspect-ratio:1536/652;object-fit:cover}
 @media(max-width:600px){.hero-banner{margin:12px 4% 18px;border-radius:14px}.hero-banner img{aspect-ratio:1536/652;object-fit:contain}}
+
+.hero-store{position:relative;display:flex;align-items:center;justify-content:space-between;gap:20px;max-width:1180px;margin:22px auto 26px;padding:30px 34px;border-radius:20px;overflow:hidden;background:linear-gradient(115deg,#071d3c 0%,#12366d 62%,#315fc1 100%);color:#fff;min-height:320px}
+.hero-store .hero-copy{position:relative;z-index:2;max-width:780px}
+.hero-store .tag{display:inline-block;background:#a77b25;color:#ffe18a;border-radius:22px;padding:7px 17px;font-weight:900;letter-spacing:1px;font-size:14px}
+.hero-store h1{font-size:clamp(30px,5vw,58px);line-height:1.12;margin:14px 0 8px;color:#f5c65b;text-shadow:2px 3px 2px #000;font-weight:950}
+.hero-store h2{font-size:clamp(20px,3vw,34px);line-height:1.3;margin:0 0 12px;color:#fff}
+.hero-store .hero-products{font-size:clamp(14px,1.7vw,21px);color:#c4d2e7;margin:10px 0 20px}
+.hero-store .hero-brands{font-size:clamp(13px,1.55vw,19px);line-height:1.5;color:#f2c15c;margin:0 0 20px}
+.hero-store .hero-bottom{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.hero-finance{background:#e9f3ff;color:#172b49;border-radius:10px;padding:9px 12px;font-size:13px}
+.hero-finance b{background:#1372a8;color:white;padding:8px;border-radius:7px;margin-right:5px}
+.hero-services{display:flex;gap:8px;flex-wrap:wrap}
+.hero-services span{font-size:13px;font-weight:800;color:white;border:1px solid #e6c15d;border-radius:24px;padding:9px 12px;background:#ffffff12}
+.hero-store .hero-art{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:10px;max-width:290px;font-size:clamp(38px,5vw,65px);filter:drop-shadow(0 7px 5px #0005)}
+@media(max-width:700px){.hero-store{margin:12px 4% 18px;padding:19px 16px;min-height:0;border-radius:14px}.hero-store .hero-art{max-width:115px;font-size:34px;gap:5px}.hero-store .hero-art span{width:44%;text-align:center}.hero-store .tag{font-size:10px;padding:6px 10px}.hero-store .hero-bottom{gap:8px}.hero-finance{font-size:11px;padding:7px}.hero-finance b{display:block;margin:0 0 5px}.hero-services span{font-size:10px;padding:7px 9px}}
+
 </style></head><body>
 <div id="customerLogin" style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(135deg,#0b1430,#3157c8)">
 <div style="background:white;width:min(420px,100%);padding:26px;border-radius:22px;box-shadow:0 25px 70px #0003">
@@ -137,7 +153,20 @@ main{max-width:1180px}.head{margin:30px 0 15px}.head h2{letter-spacing:-.6px}
 <p id="customerLoginMsg" class="muted" style="text-align:center;margin-top:14px">नए ग्राहक पहले नया अकाउंट बनाएँ।</p><p class="muted" style="text-align:center;font-size:11px">यह लॉगिन SMS OTP के बिना है। मोबाइल नंबर की पहचान सत्यापित नहीं होती।</p>
 </div></div><div id="siteApp" class="hide">
 <nav class="nav"><div class="brand">GITA <span>ELECTRONICS</span><small class="brand-meta">📍 Phokra Chowk, Dumka&nbsp; | &nbsp;📞 9546400800</small></div><div class="search"><input id="search" placeholder="Mobile, TV, AC, Fridge खोजें" oninput="render()"><button class="primary" onclick="render()">खोजें</button></div><button class="soft" onclick="openCart()">🛒 <b id="count">0</b></button><button class="soft menu-trigger" aria-label="Menu" onclick="toggleMenu(true)">☰</button></nav>
-<section class="hero-banner" aria-label="Gita Electronics store banner"><img src="assets/gita-electronics-banner.webp" alt="Gita Electronics promotional banner"></section>
+<section class="hero hero-store" aria-label="Gita Electronics">
+ <div class="hero-copy">
+  <div class="tag">SMART SHOPPING • GREAT DEALS</div>
+  <h1>गीता इलेक्ट्रॉनिक्स</h1>
+  <h2>हर ख़्वाब होगी पूरी, आसान किस्तों में!</h2>
+  <p class="hero-products">Mobile, TV, AC, Refrigerator, Washing Machine और बहुत कुछ।</p>
+  <p class="hero-brands"><strong>सभी प्रमुख ब्रांड उपलब्ध:</strong> Apple, Samsung, Vivo, Oppo, Realme, Redmi, OnePlus, Motorola, Poco, Voltas, LG, Godrej</p>
+  <div class="hero-bottom">
+   <div class="hero-finance"><b>Easy Finance Available:</b> Bajaj, HDB, TVS, IDFC, DMI, Chola Finance</div>
+   <div class="hero-services"><span>🔄 पुराना फोन एक्सचेंज सुविधा उपलब्ध</span><span>🎧 सभी तरह की मोबाइल एक्सेसरीज उपलब्ध</span></div>
+  </div>
+ </div>
+ <div class="hero-art" aria-hidden="true"><span>❄️</span><span>📺</span><span>🧊</span><span>📱</span><span>⌚</span><span>🧺</span></div>
+</section>
 <main><div class="head"><h2>हमारे प्रोडक्ट्स</h2><div class="actions"><span class="muted" id="results"></span><button class="soft" id="filterToggle" onclick="toggleFilters()">⚙️ Filter</button></div></div>
 <section class="filter-panel" id="filterPanel">
  <div class="filter-grid">
