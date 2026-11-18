@@ -186,6 +186,18 @@ body{background:#f7f8fc;color:#17213a}
  .cat{padding:9px 13px;font-size:12px}
 }
 
+
+/* Replace hero emojis with clean mobile brand logo tiles */
+.hero-store .hero-brand-logos{width:270px;max-width:270px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;filter:none;align-content:center}
+.hero-store .hero-brand-logos .brand-logo{width:auto;min-height:62px;display:flex;align-items:center;justify-content:center;border-radius:14px;background:#fff;color:#14213d;border:1px solid #ffffff90;box-shadow:0 8px 20px #07132d35;font-size:17px;font-weight:900;letter-spacing:-.4px;text-shadow:none}
+.hero-store .hero-brand-logos .apple{font-size:20px;color:#111}
+.hero-store .hero-brand-logos .samsung{font-size:13px;letter-spacing:1px;color:#142f91}
+.hero-store .hero-brand-logos .vivo{color:#1769c2;font-style:italic}
+.hero-store .hero-brand-logos .oppo{color:#168b54}
+.hero-store .hero-brand-logos .redmi{color:#e64b35}
+.hero-store .hero-brand-logos .oneplus{color:#e34236;font-size:15px}
+@media(max-width:700px){.hero-store .hero-brand-logos{width:112px;max-width:112px;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}.hero-store .hero-brand-logos .brand-logo{min-height:39px;border-radius:8px;font-size:10px;padding:3px}.hero-store .hero-brand-logos .samsung{font-size:8px;letter-spacing:.3px}.hero-store .hero-brand-logos .apple{font-size:14px}.hero-store .hero-brand-logos .oneplus{font-size:9px}}
+
 </style></head><body>
 <div id="customerLogin" style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(135deg,#0b1430,#3157c8)">
 <div style="background:white;width:min(420px,100%);padding:26px;border-radius:22px;box-shadow:0 25px 70px #0003">
@@ -210,7 +222,7 @@ body{background:#f7f8fc;color:#17213a}
    <div class="hero-services"><span>🔄 पुराना फोन एक्सचेंज सुविधा उपलब्ध</span><span>🎧 सभी तरह की मोबाइल एक्सेसरीज उपलब्ध</span></div>
   </div>
  </div>
- <div class="hero-art" aria-hidden="true"><span>❄️</span><span>📺</span><span>🧊</span><span>📱</span><span>⌚</span><span>🧺</span></div>
+ <div class="hero-art hero-brand-logos" aria-label="उपलब्ध मोबाइल ब्रांड"><span class="brand-logo apple">Apple</span><span class="brand-logo samsung">SAMSUNG</span><span class="brand-logo vivo">vivo</span><span class="brand-logo oppo">OPPO</span><span class="brand-logo redmi">REDMI</span><span class="brand-logo oneplus">OnePlus</span></div>
 </section>
 <main><div class="head"><h2>हमारे प्रोडक्ट्स</h2><div class="actions"><span class="muted" id="results"></span><button class="soft" id="filterToggle" onclick="toggleFilters()">⚙️ Filter</button></div></div>
 <section class="filter-panel" id="filterPanel">
