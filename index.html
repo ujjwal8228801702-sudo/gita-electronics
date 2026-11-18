@@ -64,6 +64,54 @@ main{max-width:1180px}.head{margin:30px 0 15px}.head h2{letter-spacing:-.6px}
 .drawer-link span:first-child{font-size:20px;width:27px;text-align:center}
 .drawer-link small{display:block;color:#71809a;font-weight:500;margin-top:2px}
 .drawer-contact{background:#eef3ff;padding:13px;border-radius:12px;margin-top:15px;font-size:13px;line-height:1.7}
+
+/* Customer page spacing and responsive header polish */
+.nav{min-height:76px;gap:14px}
+.brand{min-width:0}
+.brand-meta{font-size:10px!important;line-height:1.4!important;color:#68748a!important}
+.search{min-width:180px}
+.search input{min-width:0}
+.menu-trigger{flex:0 0 auto;width:46px;height:44px;display:grid;place-items:center;border:1px solid #e3e9f5;background:#f3f6ff;color:#172b68}
+.hero{position:relative}
+.hero>div:first-child{max-width:650px}
+.hero .tag{font-size:11px}
+.head h2{font-size:clamp(20px,3vw,26px);margin:0}
+.head .muted{background:#edf2ff;color:#3157a8;padding:6px 10px;border-radius:999px;font-weight:700}
+.cats{gap:9px;padding:4px 1px 14px}
+.cat{flex:0 0 auto}
+.product{min-width:0}
+.product>.photo{background:linear-gradient(145deg,#f0f4ff,#fbfcff)}
+.product>.body>b{font-size:14px;line-height:1.4;min-height:38px}
+.product>.body>.muted{line-height:1.35}
+.product>.body>.primary{width:100%;padding:10px 8px;font-size:13px}
+.product>.body>.primary:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+.footer{padding:30px 16px}
+@media(min-width:601px){
+ .nav{display:flex}
+ .brand{flex:0 0 auto}
+ .search{flex:1}
+}
+@media(max-width:600px){
+ .nav{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:10px;padding:12px 4%;align-items:center}
+ .brand{grid-column:1;grid-row:1;max-width:100%;min-width:0}
+ .brand:after{font-size:15px}
+ .brand:before{width:33px;height:33px;margin-right:7px}
+ .brand-meta{margin-left:40px!important;font-size:9px!important;white-space:normal!important}
+ .nav .search{grid-column:1/-1;grid-row:2;order:initial;max-width:none;width:100%;min-width:0}
+ .nav>button[onclick="openCart()"]{grid-column:2;grid-row:1}
+ .nav>.menu-trigger{grid-column:3;grid-row:1}
+ .search input{font-size:14px;padding:11px}
+ .hero{display:flex;align-items:center;min-height:190px}
+ .hero h1{font-size:29px}
+ .hero p{font-size:13px;line-height:1.55}
+ .hero-art{font-size:46px}
+ main{padding-left:4%;padding-right:4%}
+ .head{margin:23px 0 12px}
+ .product>.photo{height:145px}
+ .product>.body>b{font-size:13px;min-height:36px}
+ .product>.body>.specs{font-size:10px}
+}
+
 </style></head><body>
 <div id="customerLogin" style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(135deg,#0b1430,#3157c8)">
 <div style="background:white;width:min(420px,100%);padding:26px;border-radius:22px;box-shadow:0 25px 70px #0003">
